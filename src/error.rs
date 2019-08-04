@@ -3,23 +3,19 @@ use std::{
     fmt::{self, Display, Formatter},
 };
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ParseRuleError {
-    MissingNumber,
-    MissingB,
-    MissingS,
-    MissingSlash,
+    Missing(char),
+    Unexpected(char),
     ExtraJunk,
 }
 
 impl Display for ParseRuleError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let message = match self {
-            ParseRuleError::MissingNumber => &"Missing number in rule",
-            ParseRuleError::MissingB => &"Expected B at start of rule",
-            ParseRuleError::MissingS => &"Expected S after slash",
-            ParseRuleError::MissingSlash => &"Missing expected slash between b and s",
-            ParseRuleError::ExtraJunk => &"Extra unparsed junk at end of rule string",
+            ParseRuleError::Missing(c) => format!("Missing expected {:?}", c),
+            ParseRuleError::Unexpected(c) => format!("Unexpected {:?}", c),
+            ParseRuleError::ExtraJunk => String::from("Extra unparsed junk at end of rule string"),
         };
         write!(f, "{}", message)
     }

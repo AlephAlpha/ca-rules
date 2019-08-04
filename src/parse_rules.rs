@@ -1,8 +1,12 @@
 use crate::error::ParseRuleError;
-use std::{iter::Peekable, str::Chars};
+use std::iter::Peekable;
 
 pub trait Neighborhood {
-    fn parse_bs(chars: &mut Peekable<Chars>) -> Result<Vec<u8>, ParseRuleError>;
+    const SUFFIX: Option<char>;
+
+    fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
+    where
+        I: Iterator<Item = char>;
 }
 
 pub trait ParseBSRules {
@@ -15,23 +19,47 @@ pub trait ParseBSRules {
         Self: Sized,
     {
         let mut chars = input.chars().peekable();
-        match chars.next() {
-            Some('B') | Some('b') => (),
-            _ => return Err(ParseRuleError::MissingB),
-        }
-        let b = Self::Neighborhood::parse_bs(&mut chars)?;
+        let (b, s);
+
         match chars.peek() {
-            Some('/') => {
+            Some('B') | Some('b') => {
+                // Rulestrings using B/S notation
                 chars.next();
+                b = Self::Neighborhood::parse_bs(&mut chars)?;
+                match chars.peek() {
+                    Some('/') => {
+                        chars.next();
+                    }
+                    Some(_) => (),
+                    None => return Err(ParseRuleError::Missing('/')),
+                }
+                match chars.next() {
+                    Some('S') | Some('s') => (),
+                    _ => return Err(ParseRuleError::Missing('S')),
+                }
+                s = Self::Neighborhood::parse_bs(&mut chars)?;
             }
-            Some(_) => (),
-            None => return Err(ParseRuleError::MissingSlash),
+            _ => {
+                // Rulestrings using S/B notation
+                s = Self::Neighborhood::parse_bs(&mut chars)?;
+                match chars.next() {
+                    Some('/') => (),
+                    _ => return Err(ParseRuleError::Missing('/')),
+                }
+                b = Self::Neighborhood::parse_bs(&mut chars)?;
+            }
         }
-        match chars.next() {
-            Some('S') | Some('s') => (),
-            _ => return Err(ParseRuleError::MissingS),
+
+        if let Some(s) = Self::Neighborhood::SUFFIX {
+            if let Some(c) = chars.next() {
+                if s.to_lowercase().chain(s.to_uppercase()).all(|s| s != c) {
+                    return Err(ParseRuleError::Missing(s));
+                }
+            } else {
+                return Err(ParseRuleError::Missing(s));
+            }
         }
-        let s = Self::Neighborhood::parse_bs(&mut chars)?;
+
         match chars.next() {
             None => Ok(Self::from_bs(b, s)),
             _ => Err(ParseRuleError::ExtraJunk),

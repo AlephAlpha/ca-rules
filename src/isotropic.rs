@@ -1,11 +1,17 @@
 use crate::{error::ParseRuleError, parse_rules::Neighborhood};
-use std::{iter::Peekable, str::Chars};
+use std::iter::Peekable;
 
+#[derive(Clone, Copy, Debug)]
 pub struct Isotropic;
 
 impl Neighborhood for Isotropic {
+    const SUFFIX: Option<char> = None;
+
     #[allow(clippy::cognitive_complexity)]
-    fn parse_bs(chars: &mut Peekable<Chars>) -> Result<Vec<u8>, ParseRuleError> {
+    fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
+    where
+        I: Iterator<Item = char>,
+    {
         let mut bs = Vec::new();
 
         macro_rules! parse_keys {
@@ -136,7 +142,7 @@ impl Neighborhood for Isotropic {
                 '/' | 'S' | 's' => {
                     return Ok(bs);
                 }
-                _ => return Err(ParseRuleError::MissingNumber),
+                c => return Err(ParseRuleError::Unexpected(c)),
             }
         }
         Ok(bs)
@@ -146,7 +152,7 @@ impl Neighborhood for Isotropic {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::parse_rules::ParseBSRules;
+    use crate::{error::ParseRuleError, parse_rules::ParseBSRules};
 
     struct Rule {
         b: Vec<u8>,
@@ -167,17 +173,32 @@ mod tests {
         Rule::parse_rule(&"B2e3-anq/S12-a3")?;
         Rule::parse_rule(&"B35y/S1e2-ci3-a5i")?;
         Rule::parse_rule(&"B2i34cj6a7c8/S2-i3-a4ceit6in")?;
-        Rule::parse_rule(&"B2c3aenq4aijryz5cikqr6ac8/S1e2cik3ejqry4anrwz5a6k")?;
+        Rule::parse_rule(&"1e2cik3ejqry4anrwz5a6k/2c3aenq4aijryz5cikqr6ac8")?;
         Ok(())
     }
 
     #[test]
     fn invalid_rules() -> Result<(), ParseRuleError> {
-        assert!(Rule::parse_rule(&"2e3-anq/S12-a3").is_err());
-        assert!(Rule::parse_rule(&"B35y/1e2-ci3-a5i").is_err());
-        assert!(Rule::parse_rule(&"B3/S23h").is_err());
-        assert!(Rule::parse_rule(&"B2i34cj6a7c82-i3-a4ceit6in").is_err());
-        assert!(Rule::parse_rule(&"B2c3aenq4aijryz5cikqrz6ac8/S1e2cik3ejqry4anrwz5a6k").is_err());
+        assert_eq!(
+            Rule::parse_rule(&"12-a3/B2e3-anq").err(),
+            Some(ParseRuleError::Unexpected('B'))
+        );
+        assert_eq!(
+            Rule::parse_rule(&"B35y/1e2-ci3-a5i").err(),
+            Some(ParseRuleError::Missing('S'))
+        );
+        assert_eq!(
+            Rule::parse_rule(&"B3/S23h").err(),
+            Some(ParseRuleError::Unexpected('h'))
+        );
+        assert_eq!(
+            Rule::parse_rule(&"B2i34cj6a7c82-i3-a4ceit6in").err(),
+            Some(ParseRuleError::Missing('/'))
+        );
+        assert_eq!(
+            Rule::parse_rule(&"B2c3aenq4aijryz5cikqrz6ac8/S1e2cik3ejqry4anrwz5a6k").err(),
+            Some(ParseRuleError::Unexpected('z'))
+        );
         Ok(())
     }
 

@@ -1,0 +1,1 @@
+把 [rlifesrc](https://github.com/AlephAlpha/rlifesrc) 中读取元胞自动机的规则的部分拿出来，作为一个独立的 crate。

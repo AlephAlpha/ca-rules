@@ -3,6 +3,8 @@ name = "ca-rules"
 version = "0.1.0"
 authors = ["AlephAlpha <alephalpha911@gmail.com>"]
 edition = "2018"
+description = "Parsing rule strings of life-like cellular automata."
+homepage = "https://github.com/AlephAlpha/ca-rules"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

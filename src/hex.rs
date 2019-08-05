@@ -1,6 +1,36 @@
-use crate::{error::ParseRuleError, parse_rules::Neighborhood};
+use crate::{error::ParseRuleError, traits::Neighborhood};
 use std::iter::Peekable;
 
+/// Neighborhood for [totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
+///
+/// # Examples
+///
+/// ```
+/// use ca_rules::{Hex, ParseBSRules};
+///
+/// struct Rule {
+///     b: Vec<u8>,
+///     s: Vec<u8>,
+/// }
+///
+/// impl ParseBSRules for Rule {
+///     type Neighborhood = Hex;
+///
+///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
+///         Rule { b, s }
+///     }
+/// }
+///
+/// let life = Rule::parse_rule(&"B2/S34H").unwrap();
+///
+/// for b in 0..=6 {
+///     assert_eq!(life.b.contains(&b), [2].contains(&b));
+/// }
+///
+/// for s in 0..=6 {
+///     assert_eq!(life.s.contains(&s), [3, 4].contains(&s));
+/// }
+/// ```
 #[derive(Clone, Copy, Debug)]
 pub struct Hex;
 
@@ -30,18 +60,15 @@ impl Neighborhood for Hex {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::parse_rules::ParseBSRules;
+    use crate::traits::ParseBSRules;
 
-    struct Rule {
-        b: Vec<u8>,
-        s: Vec<u8>,
-    }
+    struct Rule;
 
     impl ParseBSRules for Rule {
         type Neighborhood = Hex;
 
-        fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-            Rule { b, s }
+        fn from_bs(_b: Vec<u8>, _s: Vec<u8>) -> Self {
+            Rule
         }
     }
 
@@ -77,18 +104,6 @@ mod tests {
             Rule::parse_rule(&"233h").err(),
             Some(ParseRuleError::Missing('/'))
         );
-        Ok(())
-    }
-
-    #[test]
-    fn game_of_life() -> Result<(), ParseRuleError> {
-        let life = Rule::parse_rule(&"B3/S23H")?;
-        for b in 0..=8_u8 {
-            assert_eq!(life.b.contains(&b), [3].contains(&b));
-        }
-        for s in 0..=8_u8 {
-            assert_eq!(life.s.contains(&s), [2, 3].contains(&s));
-        }
         Ok(())
     }
 }

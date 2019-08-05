@@ -1,6 +1,36 @@
-use crate::{error::ParseRuleError, parse_rules::Neighborhood};
+use crate::{error::ParseRuleError, traits::Neighborhood};
 use std::iter::Peekable;
 
+/// Neighborhood for [totalistic life-like rules](http://www.conwaylife.com/wiki/Totalistic_Life-like_cellular_automaton).
+///
+/// # Examples
+///
+/// ```
+/// use ca_rules::{Lifelike, ParseBSRules};
+///
+/// struct Rule {
+///     b: Vec<u8>,
+///     s: Vec<u8>,
+/// }
+///
+/// impl ParseBSRules for Rule {
+///     type Neighborhood = Lifelike;
+///
+///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
+///         Rule { b, s }
+///     }
+/// }
+///
+/// let life = Rule::parse_rule(&"B3/S23").unwrap();
+///
+/// for b in 0..=8 {
+///     assert_eq!(life.b.contains(&b), [3].contains(&b));
+/// }
+///
+/// for s in 0..=8 {
+///     assert_eq!(life.s.contains(&s), [2, 3].contains(&s));
+/// }
+/// ```
 #[derive(Clone, Copy, Debug)]
 pub struct Lifelike;
 
@@ -30,18 +60,15 @@ impl Neighborhood for Lifelike {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::parse_rules::ParseBSRules;
+    use crate::traits::ParseBSRules;
 
-    struct Rule {
-        b: Vec<u8>,
-        s: Vec<u8>,
-    }
+    struct Rule;
 
     impl ParseBSRules for Rule {
         type Neighborhood = Lifelike;
 
-        fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-            Rule { b, s }
+        fn from_bs(_b: Vec<u8>, _s: Vec<u8>) -> Self {
+            Rule
         }
     }
 
@@ -73,18 +100,6 @@ mod tests {
             Rule::parse_rule(&"233").err(),
             Some(ParseRuleError::Missing('/'))
         );
-        Ok(())
-    }
-
-    #[test]
-    fn game_of_life() -> Result<(), ParseRuleError> {
-        let life = Rule::parse_rule(&"B3/S23")?;
-        for b in 0..=8_u8 {
-            assert_eq!(life.b.contains(&b), [3].contains(&b));
-        }
-        for s in 0..=8_u8 {
-            assert_eq!(life.s.contains(&s), [2, 3].contains(&s));
-        }
         Ok(())
     }
 }

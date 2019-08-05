@@ -1,19 +1,29 @@
 use crate::error::ParseRuleError;
 use std::iter::Peekable;
 
+/// A trait for neighborhood types.
 pub trait Neighborhood {
+    /// A suffix char at the end of the rule string that denotes the neighborhood type,
+    /// e.g., `H` in the hexagonal rule `B2/S34H`.
+    ///
+    /// It is `None` if such a suffix is not needed.
     const SUFFIX: Option<char>;
 
+    /// Parsing `b` or `s` data, e.g., `3` or `23` in the rule string `B3/S23`.
     fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
     where
         I: Iterator<Item = char>;
 }
 
+/// A trait for rules of the form `Bxx/Sxx`.
 pub trait ParseBSRules {
+    /// The neighborhood type of the rule.
     type Neighborhood: Neighborhood;
 
+    /// Construct the rule from `b` and `s` data.
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
+    /// The parser.
     fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
     where
         Self: Sized,
@@ -23,7 +33,7 @@ pub trait ParseBSRules {
 
         match chars.peek() {
             Some('B') | Some('b') => {
-                // Rulestrings using B/S notation
+                // Rule strings using B/S notation
                 chars.next();
                 b = Self::Neighborhood::parse_bs(&mut chars)?;
                 match chars.peek() {
@@ -40,7 +50,7 @@ pub trait ParseBSRules {
                 s = Self::Neighborhood::parse_bs(&mut chars)?;
             }
             _ => {
-                // Rulestrings using S/B notation
+                // Rule strings using S/B notation
                 s = Self::Neighborhood::parse_bs(&mut chars)?;
                 match chars.next() {
                     Some('/') => (),
@@ -50,6 +60,7 @@ pub trait ParseBSRules {
             }
         }
 
+        // Suffix
         if let Some(s) = Self::Neighborhood::SUFFIX {
             if let Some(c) = chars.next() {
                 if s.to_lowercase().chain(s.to_uppercase()).all(|s| s != c) {

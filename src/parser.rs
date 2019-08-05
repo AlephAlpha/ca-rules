@@ -1,19 +1,4 @@
-use crate::error::ParseRuleError;
-use std::iter::Peekable;
-
-/// A trait for neighborhood types.
-pub trait Neighborhood {
-    /// A suffix char at the end of the rule string that denotes the neighborhood type,
-    /// e.g., `H` in the hexagonal rule `B2/S34H`.
-    ///
-    /// It is `None` if such a suffix is not needed.
-    const SUFFIX: Option<char>;
-
-    /// Parsing `b` or `s` data, e.g., `3` or `23` in the rule string `B3/S23`.
-    fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
-    where
-        I: Iterator<Item = char>;
-}
+use crate::{error::ParseRuleError, neighborhood::Neighborhood};
 
 /// A trait for rules of the form `Bxx/Sxx`.
 pub trait ParseBSRules {
@@ -21,6 +6,9 @@ pub trait ParseBSRules {
     type Neighborhood: Neighborhood;
 
     /// Construct the rule from `b` and `s` data.
+    ///
+    /// Please see the documents of different neighborhood types for the definition
+    /// of `b` and `s` data.
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
     /// The parser.

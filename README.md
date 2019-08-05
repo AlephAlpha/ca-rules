@@ -17,7 +17,7 @@
 ## 用法
 
 ```rust
-use ca_rules::{Lifelike, ParseBSRules};
+use ca_rules::{neighborhood, ParseBSRules};
 
 // 首先需要为规则定义一个结构体：
 // 表示规则的方式并不唯一，可根据需要采用不同的定义。
@@ -30,7 +30,7 @@ struct Rule {
 // 为规则实现 ParseBSRules trait：
 impl ParseBSRules for Rule {
     // 制定规则的领域类型：
-    type Neighborhood = Lifelike;
+    type Neighborhood = neighborhood::Lifelike;
 
     // 定义一个函数，以从 b 和 s 的数据构造规则：
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {

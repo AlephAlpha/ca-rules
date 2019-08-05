@@ -18,7 +18,7 @@
 //!
 //! # Example:
 //! ```
-//! use ca_rules::{Lifelike, ParseBSRules};
+//! use ca_rules::{neighborhood, ParseBSRules};
 //!
 //! // First you need to defind a struct for your rule:
 //! #[derive(Debug, Eq, PartialEq)]
@@ -30,7 +30,7 @@
 //! // Implement the ParseBSRules trait for your rule:
 //! impl ParseBSRules for Rule {
 //!     // Specify the neighborhood type:
-//!     type Neighborhood = Lifelike;
+//!     type Neighborhood = neighborhood::Lifelike;
 //!
 //!     // Implement a function to construct the rule from b and s data:
 //!     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
@@ -50,13 +50,9 @@
 //! ```
 
 mod error;
-mod hex;
-mod isotropic;
-mod lifelike;
-mod traits;
+/// Neighborhood types.
+pub mod neighborhood;
+mod parser;
 
 pub use error::ParseRuleError;
-pub use hex::Hex;
-pub use isotropic::Isotropic;
-pub use lifelike::Lifelike;
-pub use traits::{Neighborhood, ParseBSRules};
+pub use parser::ParseBSRules;

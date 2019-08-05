@@ -1,12 +1,24 @@
-use crate::{error::ParseRuleError, traits::Neighborhood};
+use super::Neighborhood;
+use crate::error::ParseRuleError;
 use std::iter::Peekable;
 
 /// Neighborhood for [isotropic non-totalistic life-like rules](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton).
 ///
+/// The `b` / `s` data of this neighborhood type consists of possible combinations of
+/// the states of the 8 neighbors, represented by an 8-bit binary number,
+/// that cause a cell to be born / survive.
+///
+/// For example, the following neighborhood is represented by the number `42 = 0b00101010`:
+/// ```plaintext
+/// 0 0 1
+/// 0 _ 1
+/// 0 1 0
+/// ```
+///
 /// # Examples
 ///
 /// ```
-/// use ca_rules::{Isotropic, ParseBSRules};
+/// use ca_rules::{neighborhood, ParseBSRules};
 ///
 /// struct Rule {
 ///     b: Vec<u8>,
@@ -14,7 +26,7 @@ use std::iter::Peekable;
 /// }
 ///
 /// impl ParseBSRules for Rule {
-///     type Neighborhood = Isotropic;
+///     type Neighborhood = neighborhood::Isotropic;
 ///
 ///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
 ///         Rule { b, s }
@@ -182,7 +194,7 @@ impl Neighborhood for Isotropic {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{error::ParseRuleError, traits::ParseBSRules};
+    use crate::ParseBSRules;
 
     struct Rule;
 

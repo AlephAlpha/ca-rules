@@ -6,6 +6,9 @@ edition = "2018"
 description = "Parsing rule strings of life-like cellular automata."
 homepage = "https://github.com/AlephAlpha/ca-rules"
 repository = "https://github.com/AlephAlpha/ca-rules"
+license = "MIT"
+readme = "README_en.md"
+keywords = ["game-of-life", "cellular-automata", "parser"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -1,5 +1,7 @@
 # CA rules parsers
 
+[English](README_en.md)
+
 把 [rlifesrc](https://github.com/AlephAlpha/rlifesrc) 中读取元胞自动机的规则的部分拿出来，作为一个独立的 crate。
 
 这只是一个 parser，没有别的功能。
@@ -39,7 +41,7 @@ struct Rule {
 
 // 为规则实现 ParseBSRules trait：
 impl ParseBSRules for Rule {
-    // 制定规则的领域类型：
+    // 指定规则的邻域类型（从 neighborhood mod 中选取）：
     type Neighborhood = neighborhood::Lifelike;
 
     // 定义一个函数，以从 b 和 s 的数据构造规则：

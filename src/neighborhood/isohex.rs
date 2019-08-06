@@ -137,10 +137,7 @@ impl Neighborhood for Isohex {
                     chars.next();
                     bs.push(0x3f);
                 }
-                '/' | 'S' | 's' | 'H' | 'h' => {
-                    return Ok(bs);
-                }
-                c => return Err(ParseRuleError::Unexpected(c)),
+                _ => return Ok(bs),
             }
         }
         Ok(bs)
@@ -187,7 +184,7 @@ mod tests {
         );
         assert_eq!(
             Rule::parse_rule(&"B2o3p4-o5-/S2-p3p45H").err(),
-            Some(ParseRuleError::Unexpected('-'))
+            Some(ParseRuleError::Missing('S'))
         );
         Ok(())
     }

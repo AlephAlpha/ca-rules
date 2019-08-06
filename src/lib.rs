@@ -10,13 +10,23 @@
 //!   e.g., `B2/S34H`.
 //! * [Isotropic non-totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood),
 //!   e.g., `B2o3-o4m/S12m3o4m5H`.
+//! * [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood),
+//!   e.g., `B2/S013V`.
+//! * The corresponding [Generations rules](http://www.conwaylife.com/wiki/Generations)
+//! of the above rules, e.g., `3457/357/5`.
 //!
-//! Please see [Life Wiki](www.conwaylife.com/wiki/Rulestring) for detailed definitions of
-//! these rule strings.
-//!
-//! For the above rules, both [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)
+//! For non-Generations rules, both [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)
 //! (`B3/S23`) and [S/B notaion](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)
 //! (`23/3`) are supported.
+//!
+//! For Generations rules, three different notations are supported:
+//!
+//! * B/S notation (`B357/S3457/C5`)
+//! * The notation used by [Golly](http://golly.sourceforge.net/Help/Algorithms/Generations.html) (`3457/357/5`)
+//! * The notation used by [Catagolue](https://catagolue.appspot.com/rules/generations) (`g5b357s3457`)
+//!
+//! Please see [Life Wiki](www.conwaylife.com/wiki/Rulestring) for detailed definitions and
+//! notations of these rule strings.
 //!
 //! # Example:
 //! ```
@@ -46,15 +56,14 @@
 //!     life,
 //!     Rule {
 //!         b: vec![3],
-//!         s: vec![2, 3]
+//!         s: vec![2, 3],
 //!     }
 //! )
 //! ```
 
 mod error;
-/// Neighborhood types.
 pub mod neighborhood;
 mod parser;
 
 pub use error::ParseRuleError;
-pub use parser::ParseBSRules;
+pub use parser::{ParseBSRules, ParseGenerations};

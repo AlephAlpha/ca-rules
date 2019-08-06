@@ -53,8 +53,8 @@ impl Neighborhood for Lifelike {
                     chars.next();
                     bs.push(c.to_digit(9).unwrap() as u8);
                 }
-                '/' | 'S' | 's' => return Ok(bs),
-                c => return Err(ParseRuleError::Unexpected(c)),
+                _ => return Ok(bs),
+                // c => return Err(ParseRuleError::Unexpected(c)),
             }
         }
         Ok(bs)
@@ -90,7 +90,7 @@ mod tests {
     fn invalid_rules() -> Result<(), ParseRuleError> {
         assert_eq!(
             Rule::parse_rule(&"B3/S23h").err(),
-            Some(ParseRuleError::Unexpected('h'))
+            Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
             Rule::parse_rule(&"B3/23").err(),
@@ -98,7 +98,7 @@ mod tests {
         );
         assert_eq!(
             Rule::parse_rule(&"B2e3-anq/S12-a3").err(),
-            Some(ParseRuleError::Unexpected('e'))
+            Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
             Rule::parse_rule(&"233").err(),

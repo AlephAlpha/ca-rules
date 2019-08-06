@@ -2,17 +2,27 @@
 
 把 [rlifesrc](https://github.com/AlephAlpha/rlifesrc) 中读取元胞自动机的规则的部分拿出来，作为一个独立的 crate。
 
+这只是一个 parser，没有别的功能。
+
 目前支持以下规则：
 
 * [Totalistic Life-like](http://www.conwaylife.com/wiki/Totalistic_Life-like_cellular_automaton)，如 `B3/S23`
 * [Isotropic non-totalistic Life-like](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton)，如 `B2ci3ai4c8/S02ae3eijkq4iz5ar6i7e`
 * [Totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)，如 `B2/S34H`
+* [Isotropic non-totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)，如 `B2o3-o4m/S12m3o4m5H`
+* [von Neumann 邻域](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood)，如 `B2/S013V`
+* 以上规则对于的 [Generations](http://www.conwaylife.com/wiki/Generations) 规则，如 `3457/357/5`
+
+对于非 Generations 的规则，支持 [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)（如 `B3/S23`）和 [S/B notaion](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)（如 `3/23`）。
+
+对于 Generations 规则，支持以下三种写法：
+
+* B/S/C（`B357/S3457/C5`）
+* [Golly](http://golly.sourceforge.net/Help/Algorithms/Generations.html) 的写法（`3457/357/5`）
+* [Catagolue](https://catagolue.appspot.com/rules/generations) 的写法（`g5b357s3457`）
+
 
 这些规则的具体定义和记号可见 [Life Wiki](www.conwaylife.com/wiki/Rulestring)。
-
-支持 [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)（如 `B3/S23`）和 [S/B notaion](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)（如 `3/23`）。
-
-这只是一个 parser，没有别的功能。
 
 ## 用法
 
@@ -44,7 +54,7 @@ assert_eq!(
     life,
     Rule {
         b: vec![3],
-        s: vec![2, 3]
+        s: vec![2, 3],
     }
 )
 ```

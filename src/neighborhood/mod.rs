@@ -1,13 +1,17 @@
+//! Neighborhood types.
+
 mod hex;
 mod isohex;
 mod isotropic;
 mod lifelike;
+mod neumann;
 
 use crate::error::ParseRuleError;
 pub use hex::Hex;
 pub use isohex::Isohex;
 pub use isotropic::Isotropic;
 pub use lifelike::Lifelike;
+pub use neumann::Neumann;
 use std::iter::Peekable;
 
 /// A trait for neighborhood types.

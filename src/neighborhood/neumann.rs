@@ -2,7 +2,7 @@ use super::Neighborhood;
 use crate::error::ParseRuleError;
 use std::iter::Peekable;
 
-/// Neighborhood for [totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
+/// The [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
 ///
 /// The `b` / `s` data of this neighborhood type consists of numbers of live neighbors
 /// that cause a cell to be born / survive.
@@ -18,28 +18,28 @@ use std::iter::Peekable;
 /// }
 ///
 /// impl ParseBSRules for Rule {
-///     type Neighborhood = neighborhood::Hex;
+///     type Neighborhood = neighborhood::Neumann;
 ///
 ///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
 ///         Rule { b, s }
 ///     }
 /// }
 ///
-/// let life = Rule::parse_rule(&"B2/S34H").unwrap();
+/// let life = Rule::parse_rule(&"B2/S013V").unwrap();
 ///
 /// for b in 0..=6 {
 ///     assert_eq!(life.b.contains(&b), [2].contains(&b));
 /// }
 ///
 /// for s in 0..=6 {
-///     assert_eq!(life.s.contains(&s), [3, 4].contains(&s));
+///     assert_eq!(life.s.contains(&s), [0, 1, 3].contains(&s));
 /// }
 /// ```
 #[derive(Clone, Copy, Debug)]
-pub struct Hex;
+pub struct Neumann;
 
-impl Neighborhood for Hex {
-    const SUFFIX: Option<char> = Some('H');
+impl Neighborhood for Neumann {
+    const SUFFIX: Option<char> = Some('V');
 
     fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
     where
@@ -49,9 +49,9 @@ impl Neighborhood for Hex {
 
         while let Some(&c) = chars.peek() {
             match c {
-                c if c.is_digit(7) => {
+                c if c.is_digit(5) => {
                     chars.next();
-                    bs.push(c.to_digit(7).unwrap() as u8);
+                    bs.push(c.to_digit(5).unwrap() as u8);
                 }
                 _ => return Ok(bs),
             }
@@ -68,7 +68,7 @@ mod tests {
     struct Rule;
 
     impl ParseBSRules for Rule {
-        type Neighborhood = Hex;
+        type Neighborhood = Neumann;
 
         fn from_bs(_b: Vec<u8>, _s: Vec<u8>) -> Self {
             Rule
@@ -77,34 +77,34 @@ mod tests {
 
     #[test]
     fn valid_rules() -> Result<(), ParseRuleError> {
-        Rule::parse_rule(&"B3/S23H")?;
-        Rule::parse_rule(&"B3S23H")?;
-        Rule::parse_rule(&"b3s23h")?;
-        Rule::parse_rule(&"23/3H")?;
-        Rule::parse_rule(&"23/h")?;
+        Rule::parse_rule(&"B3/S23V")?;
+        Rule::parse_rule(&"B3S23V")?;
+        Rule::parse_rule(&"b3s23v")?;
+        Rule::parse_rule(&"23/3V")?;
+        Rule::parse_rule(&"23/v")?;
         Ok(())
     }
 
     #[test]
     fn invalid_rules() -> Result<(), ParseRuleError> {
         assert_eq!(
-            Rule::parse_rule(&"B3/S23ha").err(),
+            Rule::parse_rule(&"B3/S23va").err(),
             Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
-            Rule::parse_rule(&"B3H/S23").err(),
+            Rule::parse_rule(&"B3V/S23").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
             Rule::parse_rule(&"B3/S23").err(),
-            Some(ParseRuleError::Missing('H'))
+            Some(ParseRuleError::Missing('V'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B3/S27H").err(),
-            Some(ParseRuleError::Missing('H'))
+            Rule::parse_rule(&"B3/S25V").err(),
+            Some(ParseRuleError::Missing('V'))
         );
         assert_eq!(
-            Rule::parse_rule(&"233h").err(),
+            Rule::parse_rule(&"233v").err(),
             Some(ParseRuleError::Missing('/'))
         );
         Ok(())

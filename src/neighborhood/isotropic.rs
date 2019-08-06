@@ -177,10 +177,7 @@ impl Neighborhood for Isotropic {
                     chars.next();
                     bs.push(0x00);
                 }
-                '/' | 'S' | 's' => {
-                    return Ok(bs);
-                }
-                c => return Err(ParseRuleError::Unexpected(c)),
+                _ => return Ok(bs),
             }
         }
         Ok(bs)
@@ -216,7 +213,7 @@ mod tests {
     fn invalid_rules() -> Result<(), ParseRuleError> {
         assert_eq!(
             Rule::parse_rule(&"12-a3/B2e3-anq").err(),
-            Some(ParseRuleError::Unexpected('B'))
+            Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
             Rule::parse_rule(&"B35y/1e2-ci3-a5i").err(),
@@ -224,7 +221,7 @@ mod tests {
         );
         assert_eq!(
             Rule::parse_rule(&"B3/S23h").err(),
-            Some(ParseRuleError::Unexpected('h'))
+            Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
             Rule::parse_rule(&"B2i34cj6a7c82-i3-a4ceit6in").err(),
@@ -232,7 +229,7 @@ mod tests {
         );
         assert_eq!(
             Rule::parse_rule(&"B2c3aenq4aijryz5cikqrz6ac8/S1e2cik3ejqry4anrwz5a6k").err(),
-            Some(ParseRuleError::Unexpected('z'))
+            Some(ParseRuleError::Missing('S'))
         );
         Ok(())
     }

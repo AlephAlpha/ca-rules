@@ -53,12 +53,8 @@ pub trait ParseBSRules {
                 // Rule strings using B/S notation
                 chars.next();
                 b = Self::Neighborhood::parse_bs(&mut chars)?;
-                match chars.peek() {
-                    Some('/') => {
-                        chars.next();
-                    }
-                    Some(_) => (),
-                    None => return Err(ParseRuleError::Missing('/')),
+                if let Some('/') = chars.peek() {
+                    chars.next();
                 }
                 match chars.next() {
                     Some('S') | Some('s') => (),
@@ -150,12 +146,8 @@ pub trait ParseGenerations {
             Some('B') | Some('b') => {
                 chars.next();
                 b = Self::Neighborhood::parse_bs(&mut chars)?;
-                match chars.peek() {
-                    Some('/') => {
-                        chars.next();
-                    }
-                    Some(_) => (),
-                    None => return Err(ParseRuleError::Missing('/')),
+                if let Some('/') = chars.peek() {
+                    chars.next();
                 }
                 match chars.next() {
                     Some('S') | Some('s') => (),
@@ -185,24 +177,16 @@ pub trait ParseGenerations {
             Some('C') | Some('c') | Some('G') | Some('g') => {
                 chars.next();
                 n = parse_num(&mut chars)?;
-                match chars.peek() {
-                    Some('/') => {
-                        chars.next();
-                    }
-                    Some(_) => (),
-                    None => return Err(ParseRuleError::Missing('/')),
+                if let Some('/') = chars.peek() {
+                    chars.next();
                 }
                 match chars.next() {
                     Some('B') | Some('b') => (),
                     _ => return Err(ParseRuleError::Missing('B')),
                 }
                 b = Self::Neighborhood::parse_bs(&mut chars)?;
-                match chars.peek() {
-                    Some('/') => {
-                        chars.next();
-                    }
-                    Some(_) => (),
-                    None => return Err(ParseRuleError::Missing('/')),
+                if let Some('/') = chars.peek() {
+                    chars.next();
                 }
                 match chars.next() {
                     Some('S') | Some('s') => (),
@@ -219,12 +203,9 @@ pub trait ParseGenerations {
                     _ => return Err(ParseRuleError::Missing('/')),
                 }
                 b = Self::Neighborhood::parse_bs(&mut chars)?;
-                match chars.peek() {
-                    Some('/') => {
-                        chars.next();
-                        n = parse_num(&mut chars)?;
-                    }
-                    _ => (),
+                if let Some('/') = chars.peek() {
+                    chars.next();
+                    n = parse_num(&mut chars)?;
                 }
             }
         }

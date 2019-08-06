@@ -3,7 +3,7 @@ use std::{
     fmt::{self, Display, Formatter},
 };
 
-/// Errors that can be returned when parsing ruls strings.
+/// Errors that can be returned when parsing rule strings.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ParseRuleError {
     /// Missing an expected char
@@ -22,13 +22,13 @@ impl Display for ParseRuleError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let message = match self {
             ParseRuleError::Missing(c) => format!("Missing expected {:?}", c),
-            ParseRuleError::MissingNumber => format!("Missing expected number"),
+            ParseRuleError::MissingNumber => "Missing expected number".to_string(),
             ParseRuleError::Unexpected(c) => format!("Unexpected {:?}", c),
             ParseRuleError::ExtraJunk => {
-                String::from("Extra unparsed junk at the end of the rule string")
+                "Extra unparsed junk at the end of the rule string".to_string()
             }
             ParseRuleError::GenLessThan2 => {
-                String::from("Number of states less than 2 in Generations rules")
+                "Number of states less than 2 in Generations rules".to_string()
             }
         };
         write!(f, "{}", message)

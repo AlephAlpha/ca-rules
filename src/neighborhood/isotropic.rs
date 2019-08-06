@@ -225,7 +225,7 @@ mod tests {
         );
         assert_eq!(
             Rule::parse_rule(&"B2i34cj6a7c82-i3-a4ceit6in").err(),
-            Some(ParseRuleError::Missing('/'))
+            Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
             Rule::parse_rule(&"B2c3aenq4aijryz5cikqrz6ac8/S1e2cik3ejqry4anrwz5a6k").err(),

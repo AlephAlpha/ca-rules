@@ -16,7 +16,7 @@
 //! of the above rules, e.g., `3457/357/5`.
 //!
 //! For non-Generations rules, both [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)
-//! (`B3/S23`) and [S/B notaion](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)
+//! (`B3/S23`) and [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)
 //! (`23/3`) are supported.
 //!
 //! For Generations rules, three different notations are supported:
@@ -32,7 +32,7 @@
 //! ```
 //! use ca_rules::{neighborhood, ParseBSRules};
 //!
-//! // First you need to defind a struct for your rule:
+//! // First you need to define a struct for your rule:
 //! #[derive(Debug, Eq, PartialEq)]
 //! struct Rule {
 //!     b: Vec<u8>,

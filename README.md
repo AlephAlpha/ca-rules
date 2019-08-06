@@ -13,7 +13,7 @@
 * [von Neumann 邻域](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood)，如 `B2/S013V`
 * 以上规则对于的 [Generations](http://www.conwaylife.com/wiki/Generations) 规则，如 `3457/357/5`
 
-对于非 Generations 的规则，支持 [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)（如 `B3/S23`）和 [S/B notaion](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)（如 `3/23`）。
+对于非 Generations 的规则，支持 [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)（如 `B3/S23`）和 [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)（如 `3/23`）。
 
 对于 Generations 规则，支持以下三种写法：
 

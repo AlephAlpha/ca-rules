@@ -95,11 +95,7 @@ impl Neighborhood for Isotropic {
                     for &c in keys.iter() {
                         match c {
                             $(
-                                $key => {
-                                    for &i in $value.iter() {
-                                        bs.push(i);
-                                    }
-                                }
+                                $key => bs.extend_from_slice(&( $value )),
                             )*
                             _ => unreachable!(),
                         }

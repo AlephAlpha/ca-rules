@@ -1,9 +1,11 @@
 mod hex;
+mod isohex;
 mod isotropic;
 mod lifelike;
 
 use crate::error::ParseRuleError;
 pub use hex::Hex;
+pub use isohex::Isohex;
 pub use isotropic::Isotropic;
 pub use lifelike::Lifelike;
 use std::iter::Peekable;

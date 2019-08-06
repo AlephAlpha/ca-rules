@@ -8,6 +8,8 @@
 //!   e.g., `B2ci3ai4c8/S02ae3eijkq4iz5ar6i7e`.
 //! * [Totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood),
 //!   e.g., `B2/S34H`.
+//! * [Isotropic non-totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood),
+//!   e.g., `B2o3-o4m/S12m3o4m5H`.
 //!
 //! Please see [Life Wiki](www.conwaylife.com/wiki/Rulestring) for detailed definitions of
 //! these rule strings.

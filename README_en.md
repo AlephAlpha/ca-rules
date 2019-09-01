@@ -1,6 +1,6 @@
 # CA rules parsers
 
-[中文](README.md)
+[![Travis (.org)](https://img.shields.io/travis/AlephAlpha/ca-rules)](https://travis-ci.org/AlephAlpha/ca-rules) [![Crates.io](https://img.shields.io/crates/v/ca-rules)](https://crates.io/crates/ca-rules) [![Docs.rs](https://docs.rs/ca-rules/badge.svg)](https://docs.rs/ca-rules/0.1.0/ca_rules/) [![中文](https://img.shields.io/badge/readme-%E4%B8%AD%E6%96%87-brightgreen)](README.md)
 
 Parsing rule strings of life-like and other cellular automata.
 

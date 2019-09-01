@@ -41,23 +41,7 @@ pub struct Neumann;
 impl Neighborhood for Neumann {
     const SUFFIX: Option<char> = Some('V');
 
-    fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
-    where
-        I: Iterator<Item = char>,
-    {
-        let mut bs = Vec::new();
-
-        while let Some(&c) = chars.peek() {
-            match c {
-                c if c.is_digit(5) => {
-                    chars.next();
-                    bs.push(c.to_digit(5).unwrap() as u8);
-                }
-                _ => return Ok(bs),
-            }
-        }
-        Ok(bs)
-    }
+    parse_bs_totalistic!(4);
 }
 
 #[cfg(test)]

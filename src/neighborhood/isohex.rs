@@ -49,98 +49,34 @@ pub struct Isohex;
 impl Neighborhood for Isohex {
     const SUFFIX: Option<char> = Some('H');
 
-    #[allow(clippy::cognitive_complexity)]
-    fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
-    where
-        I: Iterator<Item = char>,
-    {
-        let mut bs = Vec::new();
-
-        macro_rules! parse_keys {
-            ( $( $key: expr => $value: expr, )* ) => {
-                {
-                    chars.next();
-                    let all_keys = vec![$( $key, )*];
-                    let keys = match chars.peek() {
-                        Some('-') => {
-                            chars.next();
-                            let mut keys = Vec::new();
-                            while let Some(&c) = chars.peek() {
-                                if all_keys.contains(&c) {
-                                    chars.next();
-                                    keys.push(c);
-                                } else {
-                                    break;
-                                }
-                            }
-                            all_keys.into_iter().filter(|c| !keys.contains(c)).collect()
-                        }
-                        Some(c) if all_keys.contains(&c) => {
-                            let mut keys = Vec::new();
-                            while let Some(&c) = chars.peek() {
-                                if all_keys.contains(&c) {
-                                    chars.next();
-                                    keys.push(c);
-                                } else {
-                                    break;
-                                }
-                            }
-                            keys
-                        }
-                        Some(_) => {
-                            all_keys
-                        }
-                        None => all_keys
-                    };
-                    for &c in keys.iter() {
-                        match c {
-                            $(
-                                $key => bs.extend_from_slice(&( $value )),
-                            )*
-                            _ => unreachable!(),
-                        }
-                    }
-                }
-            };
-        }
-
-        while let Some(&c) = chars.peek() {
-            match c {
-                '0' => {
-                    chars.next();
-                    bs.push(0x00);
-                }
-                '1' => {
-                    chars.next();
-                    bs.extend_from_slice(&[0x01, 0x02, 0x04, 0x08, 0x10, 0x20]);
-                }
-                '2' => parse_keys! {
-                    'o' => [0x03, 0x05, 0x0a, 0x14, 0x28, 0x30],
-                    'm' => [0x06, 0x09, 0x11, 0x18, 0x22, 0x24],
-                    'p' => [0x0c, 0x12, 0x21],
-                },
-                '3' => parse_keys! {
-                    'o' => [0x07, 0x0b, 0x15, 0x2a, 0x34, 0x38],
-                    'm' => [0x0d, 0x0e, 0x13, 0x16, 0x1a, 0x1c, 0x23, 0x25, 0x29, 0x2c, 0x31, 0x32],
-                    'p' => [0x19, 0x26],
-                },
-                '4' => parse_keys! {
-                    'o' => [0x0f, 0x17, 0x2b, 0x35, 0x3a, 0x3c],
-                    'm' => [0x1b, 0x1d, 0x27, 0x2e, 0x36, 0x39],
-                    'p' => [0x1e, 0x2d, 0x33],
-                },
-                '5' => {
-                    chars.next();
-                    bs.extend_from_slice(&[0x1f, 0x2f, 0x37, 0x3b, 0x3d, 0x3e]);
-                }
-                '6' => {
-                    chars.next();
-                    bs.push(0x3f);
-                }
-                _ => return Ok(bs),
-            }
-        }
-        Ok(bs)
+    parse_bs_nontotalistic! {
+        '0' => {
+            'o' => [0x00],
+        },
+        '1' => {
+            'o' => [0x01, 0x02, 0x04, 0x08, 0x10, 0x20],
+        },
+        '2' => {
+            'o' => [0x03, 0x05, 0x0a, 0x14, 0x28, 0x30],
+            'm' => [0x06, 0x09, 0x11, 0x18, 0x22, 0x24],
+            'p' => [0x0c, 0x12, 0x21],
+        },
+        '3' => {
+            'o' => [0x07, 0x0b, 0x15, 0x2a, 0x34, 0x38],
+            'm' => [0x0d, 0x0e, 0x13, 0x16, 0x1a, 0x1c, 0x23, 0x25, 0x29, 0x2c, 0x31, 0x32],
+            'p' => [0x19, 0x26],
+        },
+        '4' => {
+            'o' => [0x0f, 0x17, 0x2b, 0x35, 0x3a, 0x3c],
+            'm' => [0x1b, 0x1d, 0x27, 0x2e, 0x36, 0x39],
+            'p' => [0x1e, 0x2d, 0x33],
+        },
+        '5' => {
+            'o' => [0x1f, 0x2f, 0x37, 0x3b, 0x3d, 0x3e],
+        },
+        '6' => {
+            'o' => [0x3f],
+        },
     }
 }
 
@@ -183,7 +119,7 @@ mod tests {
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B2o3p4-o5-/S2-p3p45H").err(),
+            Rule::parse_rule(&"B2o3p4-o5-p/S2-p3p45H").err(),
             Some(ParseRuleError::Missing('S'))
         );
         Ok(())

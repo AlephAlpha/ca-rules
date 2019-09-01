@@ -41,24 +41,7 @@ pub struct Lifelike;
 impl Neighborhood for Lifelike {
     const SUFFIX: Option<char> = None;
 
-    fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
-    where
-        I: Iterator<Item = char>,
-    {
-        let mut bs = Vec::new();
-
-        while let Some(&c) = chars.peek() {
-            match c {
-                c if c.is_digit(9) => {
-                    chars.next();
-                    bs.push(c.to_digit(9).unwrap() as u8);
-                }
-                _ => return Ok(bs),
-                // c => return Err(ParseRuleError::Unexpected(c)),
-            }
-        }
-        Ok(bs)
-    }
+    parse_bs_totalistic!(8);
 }
 
 #[cfg(test)]

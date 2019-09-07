@@ -1,3 +1,4 @@
+use super::Gen;
 use crate::ParseRuleError;
 
 rule_struct!(NtHex);
@@ -83,6 +84,36 @@ pub trait ParseNtHex {
     {
         let NtHex { b, s } = NtHex::parse_rule(input)?;
         Ok(Self::from_bs(b, s))
+    }
+}
+
+/// A trait for parsing [non-totalistic hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)
+/// [Generations](http://www.conwaylife.com/wiki/Generations) rules.
+///
+/// The `b` / `s` data of this type of rules consists of possible combinations of
+/// states of the 6 neighbors, represented by an 8-bit binary number,
+/// that cause a cell to be born / survive.
+///
+/// For example, the following neighborhood is represented by the number `42 = 0b101010`:
+/// ```plaintext
+///  1 0
+/// 1 _ 0
+///  1 0
+/// ```
+///
+/// Examples will be added later.
+pub trait ParseNtHexGen {
+    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
+
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let Gen {
+            rule: NtHex { b, s },
+            gen,
+        } = NtHex::parse_rule_gen(input)?;
+        Ok(Self::from_bsg(b, s, gen))
     }
 }
 

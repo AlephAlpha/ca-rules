@@ -1,3 +1,4 @@
+use super::Gen;
 use crate::ParseRuleError;
 
 rule_struct!(Neumann);
@@ -48,6 +49,28 @@ pub trait ParseNeumann {
     {
         let Neumann { b, s } = Neumann::parse_rule(input)?;
         Ok(Self::from_bs(b, s))
+    }
+}
+
+/// A trait for parsing [Generations](http://www.conwaylife.com/wiki/Generations) rules
+/// with [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
+///
+/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
+/// that cause a cell to be born / survive.
+///
+/// Examples will be added later.
+pub trait ParseNeumannGen {
+    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
+
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let Gen {
+            rule: Neumann { b, s },
+            gen,
+        } = Neumann::parse_rule_gen(input)?;
+        Ok(Self::from_bsg(b, s, gen))
     }
 }
 

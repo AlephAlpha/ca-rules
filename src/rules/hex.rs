@@ -1,3 +1,4 @@
+use super::Gen;
 use crate::ParseRuleError;
 
 rule_struct!(Hex);
@@ -47,6 +48,28 @@ pub trait ParseHex {
     {
         let Hex { b, s } = Hex::parse_rule(input)?;
         Ok(Self::from_bs(b, s))
+    }
+}
+
+/// A trait for parsing [totalistic hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)
+/// [Generations](http://www.conwaylife.com/wiki/Generations) rules.
+///
+/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
+/// that cause a cell to be born / survive.
+///
+/// Examples will be added later.
+pub trait ParseHexGen {
+    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
+
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let Gen {
+            rule: Hex { b, s },
+            gen,
+        } = Hex::parse_rule_gen(input)?;
+        Ok(Self::from_bsg(b, s, gen))
     }
 }
 

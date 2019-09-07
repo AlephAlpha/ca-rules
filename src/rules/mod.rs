@@ -1,9 +1,17 @@
 //! Parsers for different types of rules.
-pub use hex::ParseHex;
-pub use life::ParseLife;
-pub use neumann::ParseNeumann;
-pub use nthex::ParseNtHex;
-pub use ntlife::ParseNtLife;
+pub use hex::{ParseHex, ParseHexGen};
+pub use life::{ParseLife, ParseLifeGen};
+pub use neumann::{ParseNeumann, ParseNeumannGen};
+pub use nthex::{ParseNtHex, ParseNtHexGen};
+pub use ntlife::{ParseNtLife, ParseNtLifeGen};
+
+trait ParseBS {}
+
+#[derive(Clone, Debug)]
+struct Gen<T> {
+    rule: T,
+    gen: usize,
+}
 
 /// A macro to define an internal struct for the rule.
 macro_rules! rule_struct {
@@ -18,6 +26,13 @@ macro_rules! rule_struct {
             fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
                 $name { b, s }
             }
+
+            fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Gen<Self> {
+                Gen {
+                    rule: $name { b, s },
+                    gen,
+                }
+            }
         }
     };
 }
@@ -27,8 +42,6 @@ macro_rules! parse_rule {
     ($($suffix: expr)?) => {
         /// A parser for the struct.
         fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
-        where
-            Self: Sized,
         {
             let mut chars = input.chars().peekable();
             let (b, s);
@@ -73,6 +86,123 @@ macro_rules! parse_rule {
                 None => Ok(Self::from_bs(b, s)),
                 _ => Err(ParseRuleError::ExtraJunk),
             }
+        }
+
+        /// A parser for the struct.
+        fn parse_rule_gen(input: &str) -> Result<Gen<Self>, ParseRuleError>
+        {
+            let mut chars = input.chars().peekable();
+            let (b, s);
+            let mut gen = 2;
+
+            match chars.peek() {
+                // Rule strings using B/S/C notation
+                Some('B') | Some('b') => {
+                    chars.next();
+                    b = Self::parse_bs(&mut chars)?;
+                    if let Some('/') = chars.peek() {
+                        chars.next();
+                    }
+                    match chars.next() {
+                        Some('S') | Some('s') => (),
+                        _ => return Err(ParseRuleError::Missing('S')),
+                    }
+                    s = Self::parse_bs(&mut chars)?;
+                    match chars.peek() {
+                        Some('/') => {
+                            chars.next();
+                            match chars.peek() {
+                                Some('C') | Some('c') | Some('G') | Some('g') => {
+                                    chars.next();
+                                }
+                                _ => (),
+                            }
+                            gen = Self::parse_num(&mut chars)?;
+                        }
+                        Some('C') | Some('c') | Some('G') | Some('g') => {
+                            chars.next();
+                            gen = Self::parse_num(&mut chars)?;
+                        }
+                        _ => (),
+                    }
+                }
+
+                // Rule strings using C/B/S notation
+                Some('C') | Some('c') | Some('G') | Some('g') => {
+                    chars.next();
+                    gen = Self::parse_num(&mut chars)?;
+                    if let Some('/') = chars.peek() {
+                        chars.next();
+                    }
+                    match chars.next() {
+                        Some('B') | Some('b') => (),
+                        _ => return Err(ParseRuleError::Missing('B')),
+                    }
+                    b = Self::parse_bs(&mut chars)?;
+                    if let Some('/') = chars.peek() {
+                        chars.next();
+                    }
+                    match chars.next() {
+                        Some('S') | Some('s') => (),
+                        _ => return Err(ParseRuleError::Missing('S')),
+                    }
+                    s = Self::parse_bs(&mut chars)?;
+                }
+
+                // Rule strings using S/B/G notation
+                _ => {
+                    s = Self::parse_bs(&mut chars)?;
+                    match chars.next() {
+                        Some('/') => (),
+                        _ => return Err(ParseRuleError::Missing('/')),
+                    }
+                    b = Self::parse_bs(&mut chars)?;
+                    if let Some('/') = chars.peek() {
+                        chars.next();
+                        gen = Self::parse_num(&mut chars)?;
+                    }
+                }
+            }
+
+            $(
+                // Suffix
+                if let Some(c) = chars.next() {
+                    if $suffix.to_lowercase().chain($suffix.to_uppercase()).all(|s| s != c) {
+                        return Err(ParseRuleError::Missing($suffix));
+                    }
+                } else {
+                    return Err(ParseRuleError::Missing($suffix));
+                }
+            )?
+
+            if gen < 2 {
+                Err(ParseRuleError::GenLessThan2)
+            } else {match chars.next() {
+                    None => Ok(Self::from_bsg(b, s, gen)),
+                    _ => Err(ParseRuleError::ExtraJunk),
+                }
+            }
+        }
+
+        fn parse_num<I>(chars: &mut std::iter::Peekable<I>) -> Result<usize, ParseRuleError>
+        where
+            I: Iterator<Item = char>,
+        {
+            let mut n = 0;
+            if chars.peek().is_none() {
+                return Err(ParseRuleError::MissingNumber);
+            }
+            while let Some(&c) = chars.peek() {
+                match c {
+                    c if c.is_digit(10) => {
+                        chars.next();
+                        n *= 10;
+                        n += c.to_digit(10).unwrap() as usize;
+                    }
+                    _ => return Ok(n),
+                }
+            }
+            Ok(n)
         }
     };
 }

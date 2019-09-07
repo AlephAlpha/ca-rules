@@ -1,3 +1,4 @@
+use super::Gen;
 use crate::ParseRuleError;
 
 rule_struct!(NtLife);
@@ -125,6 +126,36 @@ pub trait ParseNtLife {
     {
         let NtLife { b, s } = NtLife::parse_rule(input)?;
         Ok(Self::from_bs(b, s))
+    }
+}
+
+/// A trait for parsing [non-totalistic life-like](http://www.conwaylife.com/wiki/Non-totalistic_Life-like_cellular_automaton)
+/// [Generations](http://www.conwaylife.com/wiki/Generations) rules.
+///
+/// The `b` / `s` data of this type of rules consists of possible combinations of
+/// states of the 8 neighbors, represented by an 8-bit binary number,
+/// that cause a cell to be born / survive.
+///
+/// For example, the following neighborhood is represented by the number `42 = 0b00101010`:
+/// ```plaintext
+/// 0 0 1
+/// 0 _ 1
+/// 0 1 0
+/// ```
+///
+/// Examples will be added later.
+pub trait ParseNtLifeGen {
+    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
+
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let Gen {
+            rule: NtLife { b, s },
+            gen,
+        } = NtLife::parse_rule_gen(input)?;
+        Ok(Self::from_bsg(b, s, gen))
     }
 }
 

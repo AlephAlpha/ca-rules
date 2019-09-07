@@ -1,4 +1,7 @@
-use super::Gen;
+use super::{
+    hex::{ParseHex, ParseHexGen},
+    Gen,
+};
 use crate::ParseRuleError;
 
 rule_struct!(NtHex);
@@ -34,6 +37,40 @@ impl NtHex {
         },
     }
     parse_rule!('H');
+}
+
+impl ParseHex for NtHex {
+    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
+        let mut new_b = Vec::new();
+        let mut new_s = Vec::new();
+        for i in 0_u8..=0x3f {
+            let j = i.count_ones() as u8;
+            if b.contains(&j) {
+                new_b.push(i);
+            }
+            if s.contains(&j) {
+                new_s.push(i);
+            }
+        }
+        NtHex::from_bs(new_b, new_s)
+    }
+}
+
+impl ParseHexGen for Gen<NtHex> {
+    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
+        let mut new_b = Vec::new();
+        let mut new_s = Vec::new();
+        for i in 0_u8..=0x3f {
+            let j = i.count_ones() as u8;
+            if b.contains(&j) {
+                new_b.push(i);
+            }
+            if s.contains(&j) {
+                new_s.push(i);
+            }
+        }
+        NtHex::from_bsg(new_b, new_s, gen)
+    }
 }
 
 /// A trait for parsing [non-totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
@@ -82,7 +119,7 @@ pub trait ParseNtHex {
     where
         Self: Sized,
     {
-        let NtHex { b, s } = NtHex::parse_rule(input)?;
+        let NtHex { b, s } = ParseHex::parse_rule(input).or_else(|_| NtHex::parse_rule(input))?;
         Ok(Self::from_bs(b, s))
     }
 }
@@ -112,7 +149,7 @@ pub trait ParseNtHexGen {
         let Gen {
             rule: NtHex { b, s },
             gen,
-        } = NtHex::parse_rule_gen(input)?;
+        } = ParseHexGen::parse_rule(input).or_else(|_| NtHex::parse_rule_gen(input))?;
         Ok(Self::from_bsg(b, s, gen))
     }
 }
@@ -155,6 +192,15 @@ mod tests {
         assert_eq!(
             Rule::parse_rule(&"B2o3p4-o5-p/S2-p3p45H").err(),
             Some(ParseRuleError::Missing('S'))
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn parse_hex_as_nthex() -> Result<(), ParseRuleError> {
+        assert_eq!(
+            NtHex::parse_rule(&"B3/S23H"),
+            ParseHex::parse_rule(&"B3/S23H")
         );
         Ok(())
     }

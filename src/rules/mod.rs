@@ -4,6 +4,7 @@ pub use life::{ParseLife, ParseLifeGen};
 pub use neumann::{ParseNeumann, ParseNeumannGen};
 pub use nthex::{ParseNtHex, ParseNtHexGen};
 pub use ntlife::{ParseNtLife, ParseNtLifeGen};
+pub use ntneumann::{ParseNtNeumann, ParseNtNeumannGen};
 
 trait ParseBS {}
 
@@ -13,10 +14,10 @@ struct Gen<T> {
     gen: usize,
 }
 
-/// A macro to define an internal struct for the rule.
+/// A macro to define a helper struct that represents the rule.
 macro_rules! rule_struct {
     ($name: ident) => {
-        #[derive(Clone, Debug)]
+        #[derive(Clone, Debug, Eq, PartialEq)]
         struct $name {
             b: Vec<u8>,
             s: Vec<u8>,
@@ -37,7 +38,7 @@ macro_rules! rule_struct {
     };
 }
 
-/// A macro to define a function to parse the internal struct.
+/// A macro to define a function to parse the helper struct.
 macro_rules! parse_rule {
     ($($suffix: expr)?) => {
         /// A parser for the struct.
@@ -223,9 +224,11 @@ macro_rules! parse_bs {
                         chars.next();
                         bs.push(c.to_digit($n + 1).unwrap() as u8);
                     }
-                    _ => return Ok(bs),
+                    _ => break,
                 }
             }
+
+            bs.sort();
             Ok(bs)
         }
     };
@@ -284,9 +287,11 @@ macro_rules! parse_bs {
                             }
                         }
                     ),*
-                    _ => return Ok(bs),
+                    _ => break,
                 }
             }
+
+            bs.sort();
             Ok(bs)
         }
     };
@@ -297,3 +302,4 @@ mod life;
 mod neumann;
 mod nthex;
 mod ntlife;
+mod ntneumann;

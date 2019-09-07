@@ -1,25 +1,29 @@
-use super::Neighborhood;
-use crate::error::ParseRuleError;
-use std::iter::Peekable;
+use crate::ParseRuleError;
 
-/// The [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
+rule_struct!(Neumann);
+
+impl Neumann {
+    parse_bs!(4);
+    parse_rule!('V');
+}
+
+/// A trait for parsing rules with
+/// [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
 ///
-/// The `b` / `s` data of this neighborhood type consists of numbers of live neighbors
+/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
 /// that cause a cell to be born / survive.
 ///
 /// # Examples
 ///
 /// ```
-/// use ca_rules::{neighborhood, ParseBSRules};
+/// use ca_rules::rules::ParseNeumann;
 ///
 /// struct Rule {
 ///     b: Vec<u8>,
 ///     s: Vec<u8>,
 /// }
 ///
-/// impl ParseBSRules for Rule {
-///     type Neighborhood = neighborhood::Neumann;
-///
+/// impl ParseNeumann for Rule {
 ///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
 ///         Rule { b, s }
 ///     }
@@ -35,25 +39,25 @@ use std::iter::Peekable;
 ///     assert_eq!(life.s.contains(&s), [0, 1, 3].contains(&s));
 /// }
 /// ```
-#[derive(Clone, Copy, Debug)]
-pub struct Neumann;
+pub trait ParseNeumann {
+    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
-impl Neighborhood for Neumann {
-    const SUFFIX: Option<char> = Some('V');
-
-    parse_bs!(4);
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let Neumann { b, s } = Neumann::parse_rule(input)?;
+        Ok(Self::from_bs(b, s))
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ParseBSRules;
 
     struct Rule;
 
-    impl ParseBSRules for Rule {
-        type Neighborhood = Neumann;
-
+    impl ParseNeumann for Rule {
         fn from_bs(_b: Vec<u8>, _s: Vec<u8>) -> Self {
             Rule
         }

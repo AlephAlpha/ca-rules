@@ -1,31 +1,87 @@
-//! Neighborhood types.
+//! Parsers for different types of rules.
+pub use hex::ParseHex;
+pub use life::ParseLife;
+pub use neumann::ParseNeumann;
+pub use nthex::ParseNtHex;
+pub use ntlife::ParseNtLife;
 
-use crate::error::ParseRuleError;
-pub use hex::Hex;
-pub use isohex::Isohex;
-pub use isotropic::Isotropic;
-pub use lifelike::Lifelike;
-pub use neumann::Neumann;
-use std::iter::Peekable;
+/// A macro to define an internal struct for the rule.
+macro_rules! rule_struct {
+    ($name: ident) => {
+        #[derive(Clone, Debug)]
+        struct $name {
+            b: Vec<u8>,
+            s: Vec<u8>,
+        }
 
-/// A trait for neighborhood types.
-pub trait Neighborhood {
-    /// A suffix char at the end of the rule string that denotes the neighborhood type,
-    /// e.g., `H` in the hexagonal rule `B2/S34H`.
-    ///
-    /// It is `None` if such a suffix is not needed.
-    const SUFFIX: Option<char>;
+        impl $name {
+            fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
+                $name { b, s }
+            }
+        }
+    };
+}
 
-    /// Parsing `b` or `s` data, i,e., the `3` or `23` part of the rule string `B3/S23`.
-    fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
-    where
-        I: Iterator<Item = char>;
+/// A macro to define a function to parse the internal struct.
+macro_rules! parse_rule {
+    ($($suffix: expr)?) => {
+        /// A parser for the struct.
+        fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+        where
+            Self: Sized,
+        {
+            let mut chars = input.chars().peekable();
+            let (b, s);
+
+            match chars.peek() {
+                Some('B') | Some('b') => {
+                    // Rule strings using B/S notation
+                    chars.next();
+                    b = Self::parse_bs(&mut chars)?;
+                    if let Some('/') = chars.peek() {
+                        chars.next();
+                    }
+                    match chars.next() {
+                        Some('S') | Some('s') => (),
+                        _ => return Err(ParseRuleError::Missing('S')),
+                    }
+                    s = Self::parse_bs(&mut chars)?;
+                }
+                _ => {
+                    // Rule strings using S/B notation
+                    s = Self::parse_bs(&mut chars)?;
+                    match chars.next() {
+                        Some('/') => (),
+                        _ => return Err(ParseRuleError::Missing('/')),
+                    }
+                    b = Self::parse_bs(&mut chars)?;
+                }
+            }
+
+            $(
+                // Suffix
+                if let Some(c) = chars.next() {
+                    if $suffix.to_lowercase().chain($suffix.to_uppercase()).all(|s| s != c) {
+                        return Err(ParseRuleError::Missing($suffix));
+                    }
+                } else {
+                    return Err(ParseRuleError::Missing($suffix));
+                }
+            )?
+
+            match chars.next() {
+                None => Ok(Self::from_bs(b, s)),
+                _ => Err(ParseRuleError::ExtraJunk),
+            }
+        }
+    };
 }
 
 /// A macro to define a function to parse `b` or `s` data.
 macro_rules! parse_bs {
     ($n: expr) => {
-        fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
+        /// A parser for `b` or `s` data.
+        fn parse_bs<I>(chars: &mut std::iter::Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
         where
             I: Iterator<Item = char>,
         {
@@ -45,7 +101,7 @@ macro_rules! parse_bs {
     };
 
     { $($count: expr => { $($key: expr => $value: expr),* $(,)? }),*  $(,)? } => {
-        fn parse_bs<I>(chars: &mut Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
+        fn parse_bs<I>(chars: &mut std::iter::Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
         where
             I: Iterator<Item = char>,
         {
@@ -107,7 +163,7 @@ macro_rules! parse_bs {
 }
 
 mod hex;
-mod isohex;
-mod isotropic;
-mod lifelike;
+mod life;
 mod neumann;
+mod nthex;
+mod ntlife;

@@ -64,6 +64,7 @@
 mod error;
 pub mod neighborhood;
 mod parser;
+pub mod rules;
 
 pub use error::ParseRuleError;
 pub use parser::{ParseBSRules, ParseGenerations};

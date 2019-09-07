@@ -1,25 +1,28 @@
-use super::Neighborhood;
-use crate::error::ParseRuleError;
-use std::iter::Peekable;
+use crate::ParseRuleError;
 
-/// Neighborhood for [totalistic life-like rules](http://www.conwaylife.com/wiki/Totalistic_Life-like_cellular_automaton).
+rule_struct!(Life);
+
+impl Life {
+    parse_bs!(8);
+    parse_rule!();
+}
+
+/// A trait for parsing [totalistic life-like rules](http://www.conwaylife.com/wiki/Totalistic_Life-like_cellular_automaton).
 ///
-/// The `b` / `s` data of this neighborhood type consists of numbers of live neighbors
+/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
 /// that cause a cell to be born / survive.
 ///
 /// # Examples
 ///
 /// ```
-/// use ca_rules::{neighborhood, ParseBSRules};
+/// use ca_rules::rules::ParseLife;
 ///
 /// struct Rule {
 ///     b: Vec<u8>,
 ///     s: Vec<u8>,
 /// }
 ///
-/// impl ParseBSRules for Rule {
-///     type Neighborhood = neighborhood::Lifelike;
-///
+/// impl ParseLife for Rule {
 ///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
 ///         Rule { b, s }
 ///     }
@@ -35,25 +38,25 @@ use std::iter::Peekable;
 ///     assert_eq!(life.s.contains(&s), [2, 3].contains(&s));
 /// }
 /// ```
-#[derive(Clone, Copy, Debug)]
-pub struct Lifelike;
+pub trait ParseLife {
+    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
-impl Neighborhood for Lifelike {
-    const SUFFIX: Option<char> = None;
-
-    parse_bs!(8);
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let Life { b, s } = Life::parse_rule(input)?;
+        Ok(Self::from_bs(b, s))
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ParseBSRules;
 
     struct Rule;
 
-    impl ParseBSRules for Rule {
-        type Neighborhood = Lifelike;
-
+    impl ParseLife for Rule {
         fn from_bs(_b: Vec<u8>, _s: Vec<u8>) -> Self {
             Rule
         }

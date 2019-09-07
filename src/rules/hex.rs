@@ -1,25 +1,28 @@
-use super::Neighborhood;
-use crate::error::ParseRuleError;
-use std::iter::Peekable;
+use crate::ParseRuleError;
 
-/// Neighborhood for [totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
+rule_struct!(Hex);
+
+impl Hex {
+    parse_bs!(6);
+    parse_rule!('H');
+}
+
+/// A trait for parsing [totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
 ///
-/// The `b` / `s` data of this neighborhood type consists of numbers of live neighbors
+/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
 /// that cause a cell to be born / survive.
 ///
 /// # Examples
 ///
 /// ```
-/// use ca_rules::{neighborhood, ParseBSRules};
+/// use ca_rules::rules::ParseHex;
 ///
 /// struct Rule {
 ///     b: Vec<u8>,
 ///     s: Vec<u8>,
 /// }
 ///
-/// impl ParseBSRules for Rule {
-///     type Neighborhood = neighborhood::Hex;
-///
+/// impl ParseHex for Rule {
 ///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
 ///         Rule { b, s }
 ///     }
@@ -35,25 +38,25 @@ use std::iter::Peekable;
 ///     assert_eq!(life.s.contains(&s), [3, 4].contains(&s));
 /// }
 /// ```
-#[derive(Clone, Copy, Debug)]
-pub struct Hex;
+pub trait ParseHex {
+    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
-impl Neighborhood for Hex {
-    const SUFFIX: Option<char> = Some('H');
-
-    parse_bs!(6);
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let Hex { b, s } = Hex::parse_rule(input)?;
+        Ok(Self::from_bs(b, s))
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ParseBSRules;
 
     struct Rule;
 
-    impl ParseBSRules for Rule {
-        type Neighborhood = Hex;
-
+    impl ParseHex for Rule {
         fn from_bs(_b: Vec<u8>, _s: Vec<u8>) -> Self {
             Rule
         }

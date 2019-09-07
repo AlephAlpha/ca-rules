@@ -1,54 +1,8 @@
-use super::Neighborhood;
-use crate::error::ParseRuleError;
-use std::iter::Peekable;
+use crate::ParseRuleError;
 
-/// Neighborhood for [isotropic non-totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
-///
-/// The `b` / `s` data of this neighborhood type consists of possible combinations of
-/// the states of the 6 neighbors, represented by an 6-bit binary number,
-/// that cause a cell to be born / survive.
-///
-/// For example, the following neighborhood is represented by the number `42 = 0b101010`:
-/// ```plaintext
-///  1 0
-/// 1 _ 0
-///  1 0
-/// ```
-///
-/// # Examples
-///
-/// ```
-/// use ca_rules::{neighborhood, ParseBSRules};
-///
-/// struct Rule {
-///     b: Vec<u8>,
-///     s: Vec<u8>,
-/// }
-///
-/// impl ParseBSRules for Rule {
-///     type Neighborhood = neighborhood::Isohex;
-///
-///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-///         Rule { b, s }
-///     }
-/// }
-///
-/// let life = Rule::parse_rule(&"B2/S34H").unwrap();
-///
-/// for b in 0..=63 {
-///     assert_eq!(life.b.contains(&b), [2].contains(&b.count_ones()));
-/// }
-///
-/// for s in 0..=63 {
-///     assert_eq!(life.s.contains(&s), [3, 4].contains(&s.count_ones()));
-/// }
-/// ```
-#[derive(Clone, Copy, Debug)]
-pub struct Isohex;
+rule_struct!(NtHex);
 
-impl Neighborhood for Isohex {
-    const SUFFIX: Option<char> = Some('H');
-
+impl NtHex {
     parse_bs! {
         '0' => {
             'o' => [0x00],
@@ -78,18 +32,67 @@ impl Neighborhood for Isohex {
             'o' => [0x3f],
         },
     }
+    parse_rule!('H');
+}
+
+/// A trait for parsing [non-totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
+///
+/// The `b` / `s` data of this type of rules consists of possible combinations of
+/// states of the 6 neighbors, represented by an 8-bit binary number,
+/// that cause a cell to be born / survive.
+///
+/// For example, the following neighborhood is represented by the number `42 = 0b101010`:
+/// ```plaintext
+///  1 0
+/// 1 _ 0
+///  1 0
+/// ```
+///
+/// # Examples
+///
+/// ```
+/// use ca_rules::rules::ParseNtHex;
+///
+/// struct Rule {
+///     b: Vec<u8>,
+///     s: Vec<u8>,
+/// }
+///
+/// impl ParseNtHex for Rule {
+///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
+///         Rule { b, s }
+///     }
+/// }
+///
+/// let life = Rule::parse_rule(&"B2/S34H").unwrap();
+///
+/// for b in 0..=63 {
+///     assert_eq!(life.b.contains(&b), [2].contains(&b.count_ones()));
+/// }
+///
+/// for s in 0..=63 {
+///     assert_eq!(life.s.contains(&s), [3, 4].contains(&s.count_ones()));
+/// }
+/// ```
+pub trait ParseNtHex {
+    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
+
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let NtHex { b, s } = NtHex::parse_rule(input)?;
+        Ok(Self::from_bs(b, s))
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ParseBSRules;
 
     struct Rule;
 
-    impl ParseBSRules for Rule {
-        type Neighborhood = Isohex;
-
+    impl ParseNtHex for Rule {
         fn from_bs(_b: Vec<u8>, _s: Vec<u8>) -> Self {
             Rule
         }

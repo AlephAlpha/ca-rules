@@ -276,7 +276,7 @@ mod tests {
         Rule::parse_rule(&"B3/S23")?;
         Rule::parse_rule(&"23/3/3")?;
         Rule::parse_rule(&"23//3")?;
-        // Rule::parse_rule(&"23/3")?;
+        Rule::parse_rule(&"23/3")?;
         Ok(())
     }
 

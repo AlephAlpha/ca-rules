@@ -1,54 +1,8 @@
-use super::Neighborhood;
-use crate::error::ParseRuleError;
-use std::iter::Peekable;
+use crate::ParseRuleError;
 
-/// Neighborhood for [isotropic non-totalistic life-like rules](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton).
-///
-/// The `b` / `s` data of this neighborhood type consists of possible combinations of
-/// the states of the 8 neighbors, represented by an 8-bit binary number,
-/// that cause a cell to be born / survive.
-///
-/// For example, the following neighborhood is represented by the number `42 = 0b00101010`:
-/// ```plaintext
-/// 0 0 1
-/// 0 _ 1
-/// 0 1 0
-/// ```
-///
-/// # Examples
-///
-/// ```
-/// use ca_rules::{neighborhood, ParseBSRules};
-///
-/// struct Rule {
-///     b: Vec<u8>,
-///     s: Vec<u8>,
-/// }
-///
-/// impl ParseBSRules for Rule {
-///     type Neighborhood = neighborhood::Isotropic;
-///
-///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-///         Rule { b, s }
-///     }
-/// }
-///
-/// let life = Rule::parse_rule(&"B3/S23").unwrap();
-///
-/// for b in 0..=255 {
-///     assert_eq!(life.b.contains(&b), [3].contains(&b.count_ones()));
-/// }
-///
-/// for s in 0..=255 {
-///     assert_eq!(life.s.contains(&s), [2, 3].contains(&s.count_ones()));
-/// }
-/// ```
-#[derive(Clone, Copy, Debug)]
-pub struct Isotropic;
+rule_struct!(NtLife);
 
-impl Neighborhood for Isotropic {
-    const SUFFIX: Option<char> = None;
-
+impl NtLife {
     parse_bs! {
         '0' => {
             'c' => [0x00],
@@ -120,18 +74,67 @@ impl Neighborhood for Isotropic {
             'c' => [0xff],
         },
     }
+    parse_rule!();
+}
+
+/// A trait for parsing [non-totalistic life-like rules](http://www.conwaylife.com/wiki/Non-totalistic_Life-like_cellular_automaton).
+///
+/// The `b` / `s` data of this type of rules consists of possible combinations of
+/// states of the 8 neighbors, represented by an 8-bit binary number,
+/// that cause a cell to be born / survive.
+///
+/// For example, the following neighborhood is represented by the number `42 = 0b00101010`:
+/// ```plaintext
+/// 0 0 1
+/// 0 _ 1
+/// 0 1 0
+/// ```
+///
+/// # Examples
+///
+/// ```
+/// use ca_rules::rules::ParseNtLife;
+///
+/// struct Rule {
+///     b: Vec<u8>,
+///     s: Vec<u8>,
+/// }
+///
+/// impl ParseNtLife for Rule {
+///     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
+///         Rule { b, s }
+///     }
+/// }
+///
+/// let life = Rule::parse_rule(&"B3/S23").unwrap();
+///
+/// for b in 0..=255 {
+///     assert_eq!(life.b.contains(&b), [3].contains(&b.count_ones()));
+/// }
+///
+/// for s in 0..=255 {
+///     assert_eq!(life.s.contains(&s), [2, 3].contains(&s.count_ones()));
+/// }
+/// ```
+pub trait ParseNtLife {
+    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
+
+    fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
+    where
+        Self: Sized,
+    {
+        let NtLife { b, s } = NtLife::parse_rule(input)?;
+        Ok(Self::from_bs(b, s))
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ParseBSRules;
 
     struct Rule;
 
-    impl ParseBSRules for Rule {
-        type Neighborhood = Isotropic;
-
+    impl ParseNtLife for Rule {
         fn from_bs(_b: Vec<u8>, _s: Vec<u8>) -> Self {
             Rule
         }

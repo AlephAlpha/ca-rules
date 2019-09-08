@@ -1,3 +1,5 @@
+//! Totalistic hexagonal rules.
+
 use super::Gen;
 use crate::ParseRuleError;
 
@@ -16,7 +18,7 @@ impl Hex {
 /// # Examples
 ///
 /// ```
-/// use ca_rules::rules::ParseHex;
+/// use ca_rules::ParseHex;
 ///
 /// struct Rule {
 ///     b: Vec<u8>,

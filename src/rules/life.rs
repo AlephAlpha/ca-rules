@@ -1,3 +1,5 @@
+//! Totalistic life-like rules.
+
 use super::Gen;
 use crate::ParseRuleError;
 
@@ -16,7 +18,7 @@ impl Life {
 /// # Examples
 ///
 /// ```
-/// use ca_rules::rules::ParseLife;
+/// use ca_rules::ParseLife;
 ///
 /// struct Rule {
 ///     b: Vec<u8>,
@@ -60,7 +62,7 @@ pub trait ParseLife {
 /// # Examples
 ///
 /// ```
-/// use ca_rules::rules::ParseLifeGen;
+/// use ca_rules::ParseLifeGen;
 ///
 /// #[derive(Debug, Eq, PartialEq)]
 /// struct Rule {

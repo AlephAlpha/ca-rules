@@ -1,3 +1,5 @@
+//! Non-totalistic life-like rules.
+
 use super::{
     life::{ParseLife, ParseLifeGen},
     nthex::{ParseNtHex, ParseNtHexGen},
@@ -201,7 +203,7 @@ impl ParseNtNeumannGen for Gen<NtLife> {
 /// # Examples
 ///
 /// ```
-/// use ca_rules::rules::ParseNtLife;
+/// use ca_rules::ParseNtLife;
 ///
 /// struct Rule {
 ///     b: Vec<u8>,

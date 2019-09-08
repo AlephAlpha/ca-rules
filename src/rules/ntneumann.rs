@@ -1,3 +1,5 @@
+//! Non-totalistic rules with von Neumann neighborhood.
+
 use super::{
     neumann::{ParseNeumann, ParseNeumannGen},
     Gen,
@@ -41,7 +43,7 @@ impl ParseNeumannGen for Gen<NtNeumann> {
 }
 
 /// A trait for parsing non-totalistic rules
-/// [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
+/// [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
 ///
 /// The `b` / `s` data of this type of rules consists of possible combinations of
 /// states of the 6 neighbors, represented by an 8-bit binary number,
@@ -55,7 +57,7 @@ impl ParseNeumannGen for Gen<NtNeumann> {
 /// ```
 ///
 /// For now, this parser only supports rule strings for totalistic rules, since There is not yet
-/// a generally recognized notation for isotropic non-totalistic von Neumann neighbourhood.
+/// a generally recognized notation for isotropic non-totalistic von Neumann neighborhood.
 /// [MAP notation](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
 /// will be supported in the future.
 pub trait ParseNtNeumann {

@@ -1,3 +1,5 @@
+//! Totalistic rules with von Neumann neighborhood.
+
 use super::Gen;
 use crate::ParseRuleError;
 
@@ -8,8 +10,8 @@ impl Neumann {
     parse_rule!('V');
 }
 
-/// A trait for parsing rules with
-/// [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
+/// A trait for parsing totalistic rules with
+/// [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
 ///
 /// The `b` / `s` data of this type of rules consists of numbers of live neighbors
 /// that cause a cell to be born / survive.
@@ -17,7 +19,7 @@ impl Neumann {
 /// # Examples
 ///
 /// ```
-/// use ca_rules::rules::ParseNeumann;
+/// use ca_rules::ParseNeumann;
 ///
 /// struct Rule {
 ///     b: Vec<u8>,
@@ -52,8 +54,8 @@ pub trait ParseNeumann {
     }
 }
 
-/// A trait for parsing [Generations](http://www.conwaylife.com/wiki/Generations) rules
-/// with [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
+/// A trait for parsing totalistic [Generations](http://www.conwaylife.com/wiki/Generations) rules
+/// with [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
 ///
 /// The `b` / `s` data of this type of rules consists of numbers of live neighbors
 /// that cause a cell to be born / survive.

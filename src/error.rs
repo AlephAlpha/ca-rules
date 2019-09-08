@@ -1,3 +1,5 @@
+//! Errors that can be returned when parsing rule strings.
+
 use std::{
     error::Error,
     fmt::{self, Display, Formatter},
@@ -14,7 +16,7 @@ pub enum ParseRuleError {
     Unexpected(char),
     /// Extra unparsed junk at the end of the rule string
     ExtraJunk,
-    /// Number of states less than 2 in Generations rules
+    /// Number of states less than 2 in Generations rule
     GenLessThan2,
 }
 
@@ -28,7 +30,7 @@ impl Display for ParseRuleError {
                 "Extra unparsed junk at the end of the rule string".to_string()
             }
             ParseRuleError::GenLessThan2 => {
-                "Number of states less than 2 in Generations rules".to_string()
+                "Number of states less than 2 in Generations rule".to_string()
             }
         };
         write!(f, "{}", message)

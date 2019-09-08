@@ -10,7 +10,7 @@
 //!   e.g., `B2/S34H`.
 //! * [Isotropic non-totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood),
 //!   e.g., `B2o3-o4m/S12m3o4m5H`.
-//! * [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood),
+//! * [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood),
 //!   e.g., `B2/S013V`.
 //! * The corresponding [Generations rules](http://www.conwaylife.com/wiki/Generations)
 //! of the above rules, e.g., `3457/357/5`.
@@ -25,25 +25,23 @@
 //! * The notation used by [Golly](http://golly.sourceforge.net/Help/Algorithms/Generations.html) (`3457/357/5`)
 //! * The notation used by [Catagolue](https://catagolue.appspot.com/rules/generations) (`g5b357s3457`)
 //!
-//! Please see [Life Wiki](www.conwaylife.com/wiki/Rulestring) for detailed definitions and
+//! Please see [Life Wiki](http://www.conwaylife.com/wiki/Rulestring) for detailed definitions and
 //! notations of these rule strings.
 //!
 //! # Example:
 //! ```
-//! use ca_rules::{neighborhood, ParseBSRules};
+//! use ca_rules::ParseLife;
 //!
-//! // First you need to define a struct for your rule:
+//! // Define a struct for your rule:
 //! #[derive(Debug, Eq, PartialEq)]
 //! struct Rule {
 //!     b: Vec<u8>,
 //!     s: Vec<u8>,
 //! }
 //!
-//! // Implement the ParseBSRules trait for your rule:
-//! impl ParseBSRules for Rule {
-//!     // Specify the neighborhood type:
-//!     type Neighborhood = neighborhood::Lifelike;
-//!
+//! // Implement the parser trait for your rule:
+//! // The trait depends on the type of rules you want to parse.
+//! impl ParseLife for Rule {
 //!     // Implement a function to construct the rule from b and s data:
 //!     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
 //!         Rule { b, s }
@@ -62,9 +60,8 @@
 //! ```
 
 mod error;
-pub mod neighborhood;
-mod parser;
-pub mod rules;
+mod macros;
+mod rules;
 
 pub use error::ParseRuleError;
-pub use parser::{ParseBSRules, ParseGenerations};
+pub use rules::*;

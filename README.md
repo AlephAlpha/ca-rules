@@ -1,6 +1,6 @@
 # CA rules parsers
 
-[![Travis (.org)](https://img.shields.io/travis/AlephAlpha/ca-rules)](https://travis-ci.org/AlephAlpha/ca-rules) [![Crates.io](https://img.shields.io/crates/v/ca-rules)](https://crates.io/crates/ca-rules) [![Docs.rs](https://docs.rs/ca-rules/badge.svg)](https://docs.rs/ca-rules/0.1.0/ca_rules/) [![English](https://img.shields.io/badge/readme-English-brightgreen)](README_en.md)
+[![Travis (.org)](https://img.shields.io/travis/AlephAlpha/ca-rules)](https://travis-ci.org/AlephAlpha/ca-rules) [![Crates.io](https://img.shields.io/crates/v/ca-rules)](https://crates.io/crates/ca-rules) [![Docs.rs](https://docs.rs/ca-rules/badge.svg)](https://docs.rs/ca-rules/) [![English](https://img.shields.io/badge/readme-English-brightgreen)](README_en.md)
 
 把 [rlifesrc](https://github.com/AlephAlpha/rlifesrc) 中读取元胞自动机的规则的部分拿出来，作为一个独立的 crate。
 
@@ -29,9 +29,9 @@
 ## 用法
 
 ```rust
-use ca_rules::{neighborhood, ParseBSRules};
+use ca_rules::ParseLife;
 
-// 首先需要为规则定义一个结构体：
+// 首先为规则定义一个结构体：
 // 表示规则的方式并不唯一，可根据需要采用不同的定义。
 #[derive(Debug, Eq, PartialEq)]
 struct Rule {
@@ -39,11 +39,9 @@ struct Rule {
     s: Vec<u8>,
 }
 
-// 为规则实现 ParseBSRules trait：
-impl ParseBSRules for Rule {
-    // 指定规则的邻域类型（从 neighborhood mod 中选取）：
-    type Neighborhood = neighborhood::Lifelike;
-
+// 为规则实现 parser trait：
+// 根据规则的类型来选择相应的 trait。
+impl ParseLife for Rule {
     // 定义一个函数，以从 b 和 s 的数据构造规则：
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
         Rule { b, s }
@@ -60,3 +58,5 @@ assert_eq!(
     }
 )
 ```
+
+详见[文档](https://docs.rs/ca-rules/)。

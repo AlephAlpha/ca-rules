@@ -1,3 +1,5 @@
+//! Non-totalistic hexagonal rules.
+
 use super::{
     hex::{ParseHex, ParseHexGen},
     Gen,
@@ -89,7 +91,7 @@ impl ParseHexGen for Gen<NtHex> {
 /// # Examples
 ///
 /// ```
-/// use ca_rules::rules::ParseNtHex;
+/// use ca_rules::ParseNtHex;
 ///
 /// struct Rule {
 ///     b: Vec<u8>,

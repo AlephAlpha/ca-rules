@@ -1,6 +1,6 @@
 # CA rules parsers
 
-[![Travis (.org)](https://img.shields.io/travis/AlephAlpha/ca-rules)](https://travis-ci.org/AlephAlpha/ca-rules) [![Crates.io](https://img.shields.io/crates/v/ca-rules)](https://crates.io/crates/ca-rules) [![Docs.rs](https://docs.rs/ca-rules/badge.svg)](https://docs.rs/ca-rules/0.1.0/ca_rules/) [![中文](https://img.shields.io/badge/readme-%E4%B8%AD%E6%96%87-brightgreen)](README.md)
+[![Travis (.org)](https://img.shields.io/travis/AlephAlpha/ca-rules)](https://travis-ci.org/AlephAlpha/ca-rules) [![Crates.io](https://img.shields.io/crates/v/ca-rules)](https://crates.io/crates/ca-rules) [![Docs.rs](https://docs.rs/ca-rules/badge.svg)](https://docs.rs/ca-rules/) [![中文](https://img.shields.io/badge/readme-%E4%B8%AD%E6%96%87-brightgreen)](README.md)
 
 Parsing rule strings of life-like and other cellular automata.
 
@@ -35,20 +35,18 @@ notations of these rule strings.
 ## Example:
 
 ```rust
-use ca_rules::{neighborhood, ParseBSRules};
+use ca_rules::ParseLife;
 
-// First you need to define a struct for your rule:
+// Define a struct for your rule:
 #[derive(Debug, Eq, PartialEq)]
 struct Rule {
     b: Vec<u8>,
     s: Vec<u8>,
 }
 
-// Implement the ParseBSRules trait for your rule:
-impl ParseBSRules for Rule {
-    // Specify the neighborhood type:
-    type Neighborhood = neighborhood::Lifelike;
-
+// Implement the parser trait for your rule:
+// The trait depends on the type of rules you want to parse.
+impl ParseLife for Rule {
     // Implement a function to construct the rule from b and s data:
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
         Rule { b, s }
@@ -65,3 +63,5 @@ assert_eq!(
     }
 )
 ```
+
+For details, please refer to the [doc](https://docs.rs/ca-rules/).

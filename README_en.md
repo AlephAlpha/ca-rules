@@ -54,7 +54,7 @@ impl ParseLife for Rule {
 }
 
 // Then you can parse a rule string:
-let life = Rule::parse_rule(&"B3/S23").unwrap();
+let life = Rule::parse_rule("B3/S23").unwrap();
 assert_eq!(
     life,
     Rule {

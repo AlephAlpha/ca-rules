@@ -93,6 +93,7 @@ impl ParseHexGen for Gen<NtHex> {
 /// ```
 /// use ca_rules::ParseNtHex;
 ///
+/// #[derive(Debug, Eq, PartialEq)]
 /// struct Rule {
 ///     b: Vec<u8>,
 ///     s: Vec<u8>,
@@ -104,15 +105,9 @@ impl ParseHexGen for Gen<NtHex> {
 ///     }
 /// }
 ///
-/// let life = Rule::parse_rule(&"B2/S34H").unwrap();
+/// let life = Rule::parse_rule("B2o3-o4m/S12m3o4m5H").unwrap();
 ///
-/// for b in 0..=63 {
-///     assert_eq!(life.b.contains(&b), [2].contains(&b.count_ones()));
-/// }
-///
-/// for s in 0..=63 {
-///     assert_eq!(life.s.contains(&s), [3, 4].contains(&s.count_ones()));
-/// }
+/// assert!(life.s.contains(&0x2a));
 /// ```
 pub trait ParseNtHex {
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
@@ -140,7 +135,28 @@ pub trait ParseNtHex {
 ///  1 0
 /// ```
 ///
-/// Examples will be added later.
+/// # Examples
+///
+/// ```
+/// use ca_rules::ParseNtHexGen;
+///
+/// #[derive(Debug, Eq, PartialEq)]
+/// struct Rule {
+///     b: Vec<u8>,
+///     s: Vec<u8>,
+///     gen: usize,
+/// }
+///
+/// impl ParseNtHexGen for Rule {
+///     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
+///         Rule { b, s, gen }
+///     }
+/// }
+///
+/// let life = Rule::parse_rule("g3b2o6s2-o34m56h").unwrap();
+///
+/// assert_eq!(life.gen, 3);
+/// ```
 pub trait ParseNtHexGen {
     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
 
@@ -170,29 +186,29 @@ mod tests {
 
     #[test]
     fn valid_rules() -> Result<(), ParseRuleError> {
-        Rule::parse_rule(&"B3/S23H")?;
-        Rule::parse_rule(&"b2os24mh")?;
-        Rule::parse_rule(&"12m3o4m5/2o3-o4mH")?;
-        Rule::parse_rule(&"B2o3p4-o5/S2-p3p45H")?;
+        Rule::parse_rule("B3/S23H")?;
+        Rule::parse_rule("b2os24mh")?;
+        Rule::parse_rule("12m3o4m5/2o3-o4mH")?;
+        Rule::parse_rule("B2o3p4-o5/S2-p3p45H")?;
         Ok(())
     }
 
     #[test]
     fn invalid_rules() -> Result<(), ParseRuleError> {
         assert_eq!(
-            Rule::parse_rule(&"B3/S23").err(),
+            Rule::parse_rule("B3/S23").err(),
             Some(ParseRuleError::Missing('H'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B2/o24mH").err(),
+            Rule::parse_rule("B2/o24mH").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"b2o3-o4m12m3o4m5h").err(),
+            Rule::parse_rule("b2o3-o4m12m3o4m5h").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B2o3p4-o5-p/S2-p3p45H").err(),
+            Rule::parse_rule("B2o3p4-o5-p/S2-p3p45H").err(),
             Some(ParseRuleError::Missing('S'))
         );
         Ok(())
@@ -200,10 +216,14 @@ mod tests {
 
     #[test]
     fn parse_hex_as_nthex() -> Result<(), ParseRuleError> {
-        assert_eq!(
-            NtHex::parse_rule(&"B3/S23H"),
-            ParseHex::parse_rule(&"B3/S23H")
-        );
+        let rule: NtHex = ParseHex::parse_rule("B2/S34H")?;
+        for b in 0..=0x3f {
+            assert_eq!(rule.b.contains(&b), [2].contains(&b.count_ones()));
+        }
+
+        for s in 0..=0x3f {
+            assert_eq!(rule.s.contains(&s), [3, 4].contains(&s.count_ones()));
+        }
         Ok(())
     }
 }

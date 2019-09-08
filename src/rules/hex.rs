@@ -20,6 +20,7 @@ impl Hex {
 /// ```
 /// use ca_rules::ParseHex;
 ///
+/// #[derive(Debug, Eq, PartialEq)]
 /// struct Rule {
 ///     b: Vec<u8>,
 ///     s: Vec<u8>,
@@ -31,15 +32,15 @@ impl Hex {
 ///     }
 /// }
 ///
-/// let life = Rule::parse_rule(&"B2/S34H").unwrap();
+/// let life = Rule::parse_rule("B2/S34H").unwrap();
 ///
-/// for b in 0..=6 {
-///     assert_eq!(life.b.contains(&b), [2].contains(&b));
-/// }
-///
-/// for s in 0..=6 {
-///     assert_eq!(life.s.contains(&s), [3, 4].contains(&s));
-/// }
+/// assert_eq!(
+///     life,
+///     Rule {
+///         b: vec![2],
+///         s: vec![3, 4],
+///     }
+/// )
 /// ```
 pub trait ParseHex {
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
@@ -59,7 +60,35 @@ pub trait ParseHex {
 /// The `b` / `s` data of this type of rules consists of numbers of live neighbors
 /// that cause a cell to be born / survive.
 ///
-/// Examples will be added later.
+/// # Examples
+///
+/// ```
+/// use ca_rules::ParseHexGen;
+///
+/// #[derive(Debug, Eq, PartialEq)]
+/// struct Rule {
+///     b: Vec<u8>,
+///     s: Vec<u8>,
+///     gen: usize,
+/// }
+///
+/// impl ParseHexGen for Rule {
+///     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
+///         Rule { b, s, gen }
+///     }
+/// }
+///
+/// let life = Rule::parse_rule("g4b24s13h").unwrap();
+///
+/// assert_eq!(
+///     life,
+///     Rule {
+///         b: vec![2, 4],
+///         s: vec![1, 3],
+///         gen: 4,
+///     }
+/// )
+/// ```
 pub trait ParseHexGen {
     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
 
@@ -87,36 +116,77 @@ mod tests {
         }
     }
 
+    struct GenRule;
+
+    impl ParseHexGen for GenRule {
+        fn from_bsg(_b: Vec<u8>, _s: Vec<u8>, _gen: usize) -> Self {
+            GenRule
+        }
+    }
+
     #[test]
     fn valid_rules() -> Result<(), ParseRuleError> {
-        Rule::parse_rule(&"B3/S23H")?;
-        Rule::parse_rule(&"B3S23H")?;
-        Rule::parse_rule(&"b3s23h")?;
-        Rule::parse_rule(&"23/3H")?;
-        Rule::parse_rule(&"23/h")?;
+        Rule::parse_rule("B3/S23H")?;
+        Rule::parse_rule("B3S23H")?;
+        Rule::parse_rule("b3s23h")?;
+        Rule::parse_rule("23/3H")?;
+        Rule::parse_rule("23/h")?;
         Ok(())
     }
 
     #[test]
     fn invalid_rules() -> Result<(), ParseRuleError> {
         assert_eq!(
-            Rule::parse_rule(&"B3/S23ha").err(),
+            Rule::parse_rule("B3/S23ha").err(),
             Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
-            Rule::parse_rule(&"B3H/S23").err(),
+            Rule::parse_rule("B3H/S23").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B3/S23").err(),
+            Rule::parse_rule("B3/S23").err(),
             Some(ParseRuleError::Missing('H'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B3/S27H").err(),
+            Rule::parse_rule("B3/S27H").err(),
             Some(ParseRuleError::Missing('H'))
         );
         assert_eq!(
-            Rule::parse_rule(&"233h").err(),
+            Rule::parse_rule("233h").err(),
+            Some(ParseRuleError::Missing('/'))
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn valid_rules_gen() -> Result<(), ParseRuleError> {
+        GenRule::parse_rule("B3/S23/C3H")?;
+        GenRule::parse_rule("B3S23G3H")?;
+        GenRule::parse_rule("g3b3s23h")?;
+        GenRule::parse_rule("B3/S23H")?;
+        GenRule::parse_rule("23/3/3h")?;
+        GenRule::parse_rule("23//3H")?;
+        GenRule::parse_rule("23/3h")?;
+        Ok(())
+    }
+
+    #[test]
+    fn invalid_rules_gen() -> Result<(), ParseRuleError> {
+        assert_eq!(
+            GenRule::parse_rule("B3/S23").err(),
+            Some(ParseRuleError::Missing('H'))
+        );
+        assert_eq!(
+            GenRule::parse_rule("B3/S23/H").err(),
+            Some(ParseRuleError::MissingNumber)
+        );
+        assert_eq!(
+            GenRule::parse_rule("g1b3s23h").err(),
+            Some(ParseRuleError::GenLessThan2)
+        );
+        assert_eq!(
+            GenRule::parse_rule("2333h").err(),
             Some(ParseRuleError::Missing('/'))
         );
         Ok(())

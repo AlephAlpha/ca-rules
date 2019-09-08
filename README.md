@@ -9,7 +9,7 @@
 目前支持以下规则：
 
 * [Totalistic Life-like](http://www.conwaylife.com/wiki/Totalistic_Life-like_cellular_automaton)，如 `B3/S23`
-* [Isotropic non-totalistic Life-like](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton)，如 `B2ci3ai4c8/S02ae3eijkq4iz5ar6i7e`
+* [Isotropic non-totalistic Life-like](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton)，如 `B35y/S1e2-ci3-a5i`
 * [Totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)，如 `B2/S34H`
 * [Isotropic non-totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)，如 `B2o3-o4m/S12m3o4m5H`
 * [von Neumann 邻域](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood)，如 `B2/S013V`
@@ -49,7 +49,7 @@ impl ParseLife for Rule {
 }
 
 // 然后就可以 parse 了：
-let life = Rule::parse_rule(&"B3/S23").unwrap();
+let life = Rule::parse_rule("B3/S23").unwrap();
 assert_eq!(
     life,
     Rule {

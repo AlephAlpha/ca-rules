@@ -20,6 +20,7 @@ impl Life {
 /// ```
 /// use ca_rules::ParseLife;
 ///
+/// #[derive(Debug, Eq, PartialEq)]
 /// struct Rule {
 ///     b: Vec<u8>,
 ///     s: Vec<u8>,
@@ -31,15 +32,15 @@ impl Life {
 ///     }
 /// }
 ///
-/// let life = Rule::parse_rule(&"B3/S23").unwrap();
+/// let life = Rule::parse_rule("B3/S23").unwrap();
 ///
-/// for b in 0..=8 {
-///     assert_eq!(life.b.contains(&b), [3].contains(&b));
-/// }
-///
-/// for s in 0..=8 {
-///     assert_eq!(life.s.contains(&s), [2, 3].contains(&s));
-/// }
+/// assert_eq!(
+///     life,
+///     Rule {
+///         b: vec![3],
+///         s: vec![2, 3],
+///     }
+/// )
 /// ```
 pub trait ParseLife {
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
@@ -77,7 +78,7 @@ pub trait ParseLife {
 ///     }
 /// }
 ///
-/// let life = Rule::parse_rule(&"3457/357/5").unwrap();
+/// let life = Rule::parse_rule("3457/357/5").unwrap();
 ///
 /// assert_eq!(
 ///     life,
@@ -125,30 +126,30 @@ mod tests {
 
     #[test]
     fn valid_rules() -> Result<(), ParseRuleError> {
-        Rule::parse_rule(&"B3/S23")?;
-        Rule::parse_rule(&"B3S23")?;
-        Rule::parse_rule(&"b3s23")?;
-        Rule::parse_rule(&"23/3")?;
-        Rule::parse_rule(&"23/")?;
+        Rule::parse_rule("B3/S23")?;
+        Rule::parse_rule("B3S23")?;
+        Rule::parse_rule("b3s23")?;
+        Rule::parse_rule("23/3")?;
+        Rule::parse_rule("23/")?;
         Ok(())
     }
 
     #[test]
     fn invalid_rules() -> Result<(), ParseRuleError> {
         assert_eq!(
-            Rule::parse_rule(&"B3/S23h").err(),
+            Rule::parse_rule("B3/S23h").err(),
             Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
-            Rule::parse_rule(&"B3/23").err(),
+            Rule::parse_rule("B3/23").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B2e3-anq/S12-a3").err(),
+            Rule::parse_rule("B2e3-anq/S12-a3").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"233").err(),
+            Rule::parse_rule("233").err(),
             Some(ParseRuleError::Missing('/'))
         );
         Ok(())
@@ -156,32 +157,32 @@ mod tests {
 
     #[test]
     fn valid_rules_gen() -> Result<(), ParseRuleError> {
-        GenRule::parse_rule(&"B3/S23/C3")?;
-        GenRule::parse_rule(&"B3S23G3")?;
-        GenRule::parse_rule(&"g3b3s23")?;
-        GenRule::parse_rule(&"B3/S23")?;
-        GenRule::parse_rule(&"23/3/3")?;
-        GenRule::parse_rule(&"23//3")?;
-        GenRule::parse_rule(&"23/3")?;
+        GenRule::parse_rule("B3/S23/C3")?;
+        GenRule::parse_rule("B3S23G3")?;
+        GenRule::parse_rule("g3b3s23")?;
+        GenRule::parse_rule("B3/S23")?;
+        GenRule::parse_rule("23/3/3")?;
+        GenRule::parse_rule("23//3")?;
+        GenRule::parse_rule("23/3")?;
         Ok(())
     }
 
     #[test]
     fn invalid_rules_gen() -> Result<(), ParseRuleError> {
         assert_eq!(
-            GenRule::parse_rule(&"B3/S23h").err(),
+            GenRule::parse_rule("B3/S23h").err(),
             Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
-            GenRule::parse_rule(&"B3/S23/").err(),
+            GenRule::parse_rule("B3/S23/").err(),
             Some(ParseRuleError::MissingNumber)
         );
         assert_eq!(
-            GenRule::parse_rule(&"g1b3s23").err(),
+            GenRule::parse_rule("g1b3s23").err(),
             Some(ParseRuleError::GenLessThan2)
         );
         assert_eq!(
-            GenRule::parse_rule(&"2333").err(),
+            GenRule::parse_rule("2333").err(),
             Some(ParseRuleError::Missing('/'))
         );
         Ok(())

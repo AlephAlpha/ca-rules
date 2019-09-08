@@ -42,11 +42,11 @@ impl ParseNeumannGen for Gen<NtNeumann> {
     }
 }
 
-/// A trait for parsing non-totalistic rules
+/// A trait for parsing non-totalistic rules with
 /// [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
 ///
 /// The `b` / `s` data of this type of rules consists of possible combinations of
-/// states of the 6 neighbors, represented by an 8-bit binary number,
+/// states of the 4 neighbors, represented by an 8-bit binary number,
 /// that cause a cell to be born / survive.
 ///
 /// For example, the following neighborhood is represented by the number `10 = 0b1010`:
@@ -56,10 +56,11 @@ impl ParseNeumannGen for Gen<NtNeumann> {
 ///   0
 /// ```
 ///
-/// For now, this parser only supports rule strings for totalistic rules, since There is not yet
-/// a generally recognized notation for isotropic non-totalistic von Neumann neighborhood.
+/// There is not yet a generally recognized notation for isotropic non-totalistic
+/// von Neumann neighborhood.
+/// For now, this parser only supports totalistic rule strings. Supports for
 /// [MAP notation](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
-/// will be supported in the future.
+/// will be added in the future.
 pub trait ParseNtNeumann {
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
@@ -72,21 +73,25 @@ pub trait ParseNtNeumann {
     }
 }
 
-/// A trait for parsing [non-totalistic hexagonal](http://www.conwaylife.com/wiki/Neumannagonal_neighbourhood)
-/// [Generations](http://www.conwaylife.com/wiki/Generations) rules.
+/// A trait for parsing non-totalistic [Generations](http://www.conwaylife.com/wiki/Generations)
+/// rules with [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
 ///
 /// The `b` / `s` data of this type of rules consists of possible combinations of
-/// states of the 6 neighbors, represented by an 8-bit binary number,
+/// states of the 4 neighbors, represented by an 8-bit binary number,
 /// that cause a cell to be born / survive.
 ///
-/// For example, the following neighborhood is represented by the number `42 = 0b101010`:
+/// For example, the following neighborhood is represented by the number `10 = 0b1010`:
 /// ```plaintext
-///  1 0
-/// 1 _ 0
-///  1 0
+///   1
+/// 0 _ 1
+///   0
 /// ```
 ///
-/// Examples will be added later.
+/// There is not yet a generally recognized notation for isotropic non-totalistic
+/// von Neumann neighborhood.
+/// For now, this parser only supports totalistic rule strings. Supports for
+/// [MAP notation](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+/// will be added in the future.
 pub trait ParseNtNeumannGen {
     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
 
@@ -116,36 +121,49 @@ mod tests {
 
     #[test]
     fn valid_rules() -> Result<(), ParseRuleError> {
-        Rule::parse_rule(&"B3/S23V")?;
-        Rule::parse_rule(&"B3S23V")?;
-        Rule::parse_rule(&"b3s23v")?;
-        Rule::parse_rule(&"23/3V")?;
-        Rule::parse_rule(&"23/v")?;
+        Rule::parse_rule("B3/S23V")?;
+        Rule::parse_rule("B3S23V")?;
+        Rule::parse_rule("b3s23v")?;
+        Rule::parse_rule("23/3V")?;
+        Rule::parse_rule("23/v")?;
         Ok(())
     }
 
     #[test]
     fn invalid_rules() -> Result<(), ParseRuleError> {
         assert_eq!(
-            Rule::parse_rule(&"B3/S23va").err(),
+            Rule::parse_rule("B3/S23va").err(),
             Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
-            Rule::parse_rule(&"B3V/S23").err(),
+            Rule::parse_rule("B3V/S23").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B3/S23").err(),
+            Rule::parse_rule("B3/S23").err(),
             Some(ParseRuleError::Missing('V'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B3/S25V").err(),
+            Rule::parse_rule("B3/S25V").err(),
             Some(ParseRuleError::Missing('V'))
         );
         assert_eq!(
-            Rule::parse_rule(&"233v").err(),
+            Rule::parse_rule("233v").err(),
             Some(ParseRuleError::Missing('/'))
         );
+        Ok(())
+    }
+
+    #[test]
+    fn parse_neumann_as_ntneumann() -> Result<(), ParseRuleError> {
+        let rule: NtNeumann = ParseNeumann::parse_rule("B2/S013V")?;
+        for b in 0..=0x0f {
+            assert_eq!(rule.b.contains(&b), [2].contains(&b.count_ones()));
+        }
+
+        for s in 0..=0x0f {
+            assert_eq!(rule.s.contains(&s), [0, 1, 3].contains(&s.count_ones()));
+        }
         Ok(())
     }
 }

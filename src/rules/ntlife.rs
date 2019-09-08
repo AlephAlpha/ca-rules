@@ -205,6 +205,7 @@ impl ParseNtNeumannGen for Gen<NtLife> {
 /// ```
 /// use ca_rules::ParseNtLife;
 ///
+/// #[derive(Debug, Eq, PartialEq)]
 /// struct Rule {
 ///     b: Vec<u8>,
 ///     s: Vec<u8>,
@@ -216,15 +217,9 @@ impl ParseNtNeumannGen for Gen<NtLife> {
 ///     }
 /// }
 ///
-/// let life = Rule::parse_rule(&"B3/S23").unwrap();
+/// let life = Rule::parse_rule("B35y/S1e2-ci3-a5i").unwrap();
 ///
-/// for b in 0..=255 {
-///     assert_eq!(life.b.contains(&b), [3].contains(&b.count_ones()));
-/// }
-///
-/// for s in 0..=255 {
-///     assert_eq!(life.s.contains(&s), [2, 3].contains(&s.count_ones()));
-/// }
+/// assert!(life.s.contains(&0x2a));
 /// ```
 pub trait ParseNtLife {
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
@@ -255,7 +250,28 @@ pub trait ParseNtLife {
 /// 0 1 0
 /// ```
 ///
-/// Examples will be added later.
+/// # Examples
+///
+/// ```
+/// use ca_rules::ParseNtLifeGen;
+///
+/// #[derive(Debug, Eq, PartialEq)]
+/// struct Rule {
+///     b: Vec<u8>,
+///     s: Vec<u8>,
+///     gen: usize,
+/// }
+///
+/// impl ParseNtLifeGen for Rule {
+///     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
+///         Rule { b, s, gen }
+///     }
+/// }
+///
+/// let life = Rule::parse_rule("g4b2c36k7s2ak34-a5-i").unwrap();
+///
+/// assert_eq!(life.gen, 4);
+/// ```
 pub trait ParseNtLifeGen {
     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
 
@@ -288,32 +304,32 @@ mod tests {
 
     #[test]
     fn valid_rules() -> Result<(), ParseRuleError> {
-        Rule::parse_rule(&"B3/S23")?;
-        Rule::parse_rule(&"B3/S23V")?;
-        Rule::parse_rule(&"B2e3-anq/S12-a3")?;
-        Rule::parse_rule(&"B35y/S1e2-ci3-a5i")?;
-        Rule::parse_rule(&"B2o3p4-o5/S2-p3p45H")?;
-        Rule::parse_rule(&"B2i34cj6a7c8/S2-i3-a4ceit6in")?;
-        Rule::parse_rule(&"1e2cik3ejqry4anrwz5a6k/2c3aenq4aijryz5cikqr6ac8")?;
+        Rule::parse_rule("B3/S23")?;
+        Rule::parse_rule("B3/S23V")?;
+        Rule::parse_rule("B2e3-anq/S12-a3")?;
+        Rule::parse_rule("B35y/S1e2-ci3-a5i")?;
+        Rule::parse_rule("B2o3p4-o5/S2-p3p45H")?;
+        Rule::parse_rule("B2i34cj6a7c8/S2-i3-a4ceit6in")?;
+        Rule::parse_rule("1e2cik3ejqry4anrwz5a6k/2c3aenq4aijryz5cikqr6ac8")?;
         Ok(())
     }
 
     #[test]
     fn invalid_rules() -> Result<(), ParseRuleError> {
         assert_eq!(
-            Rule::parse_rule(&"12-a3/B2e3-anq").err(),
+            Rule::parse_rule("12-a3/B2e3-anq").err(),
             Some(ParseRuleError::ExtraJunk)
         );
         assert_eq!(
-            Rule::parse_rule(&"B35y/1e2-ci3-a5i").err(),
+            Rule::parse_rule("B35y/1e2-ci3-a5i").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B2i34cj6a7c82-i3-a4ceit6in").err(),
+            Rule::parse_rule("B2i34cj6a7c82-i3-a4ceit6in").err(),
             Some(ParseRuleError::Missing('S'))
         );
         assert_eq!(
-            Rule::parse_rule(&"B2c3aenq4aijryz5cikqrz6ac8/S1e2cik3ejqry4anrwz5a6k").err(),
+            Rule::parse_rule("B2c3aenq4aijryz5cikqrz6ac8/S1e2cik3ejqry4anrwz5a6k").err(),
             Some(ParseRuleError::Missing('S'))
         );
         Ok(())
@@ -321,16 +337,20 @@ mod tests {
 
     #[test]
     fn parse_life_as_ntlife() -> Result<(), ParseRuleError> {
-        assert_eq!(
-            NtLife::parse_rule(&"B3/S23"),
-            ParseLife::parse_rule(&"B3/S23")
-        );
+        let rule: NtLife = ParseLife::parse_rule("B2/S23")?;
+        for b in 0..=0xff {
+            assert_eq!(rule.b.contains(&b), [2].contains(&b.count_ones()));
+        }
+
+        for s in 0..=0xff {
+            assert_eq!(rule.s.contains(&s), [2, 3].contains(&s.count_ones()));
+        }
         Ok(())
     }
 
     #[test]
     fn parse_hex_as_ntlife() -> Result<(), ParseRuleError> {
-        let rule: NtLife = ParseNtHex::parse_rule(&"B2/S34H")?;
+        let rule: NtLife = ParseNtHex::parse_rule("B2/S34H")?;
         for b in 0..=0xff {
             assert_eq!(
                 rule.b.contains(&b),
@@ -349,7 +369,7 @@ mod tests {
 
     #[test]
     fn parse_neumann_as_ntlife() -> Result<(), ParseRuleError> {
-        let rule: NtLife = ParseNtNeumann::parse_rule(&"B2/S013V")?;
+        let rule: NtLife = ParseNtNeumann::parse_rule("B2/S013V")?;
         for b in 0..=0xff {
             assert_eq!(
                 rule.b.contains(&b),

@@ -83,7 +83,7 @@ macro_rules! parse_rule {
             let mut gen = 2;
 
             match chars.peek() {
-                // Rule strings using B/S/C notation
+                // Rule strings using B/S/G notation
                 Some('B') | Some('b') => {
                     chars.next();
                     b = Self::parse_bs(&mut chars)?;
@@ -114,7 +114,7 @@ macro_rules! parse_rule {
                     }
                 }
 
-                // Rule strings using C/B/S notation
+                // Rule strings using G/B/S notation
                 Some('C') | Some('c') | Some('G') | Some('g') => {
                     chars.next();
                     gen = Self::parse_num(&mut chars)?;
@@ -171,12 +171,13 @@ macro_rules! parse_rule {
             }
         }
 
+        /// A parser for numbers.
         fn parse_num<I>(chars: &mut std::iter::Peekable<I>) -> Result<usize, ParseRuleError>
         where
             I: Iterator<Item = char>,
         {
             let mut n = 0;
-            if chars.peek().is_none() {
+            if chars.peek().is_none() || !chars.peek().unwrap().is_digit(10) {
                 return Err(ParseRuleError::MissingNumber);
             }
             while let Some(&c) = chars.peek() {

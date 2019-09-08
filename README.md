@@ -2,7 +2,7 @@
 
 [![Travis (.org)](https://img.shields.io/travis/AlephAlpha/ca-rules)](https://travis-ci.org/AlephAlpha/ca-rules) [![Crates.io](https://img.shields.io/crates/v/ca-rules)](https://crates.io/crates/ca-rules) [![Docs.rs](https://docs.rs/ca-rules/badge.svg)](https://docs.rs/ca-rules/) [![English](https://img.shields.io/badge/readme-English-brightgreen)](README_en.md)
 
-把 [rlifesrc](https://github.com/AlephAlpha/rlifesrc) 中读取元胞自动机的规则的部分拿出来，作为一个独立的 crate。
+把 [rlifesrc](https://github.com/AlephAlpha/rlifesrc) 中读取元胞自动机的规则的部分拿出来，作为一个独立的 crate。功能没增加多少，代码却越弄越复杂。
 
 这只是一个 parser，没有别的功能。
 

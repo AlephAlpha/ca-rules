@@ -25,7 +25,7 @@
 //! * The notation used by [Golly](http://golly.sourceforge.net/Help/Algorithms/Generations.html) (`3457/357/5`)
 //! * The notation used by [Catagolue](https://catagolue.appspot.com/rules/generations) (`g5b357s3457`)
 //!
-//! Please see [Life Wiki](http://www.conwaylife.com/wiki/Rulestring) for detailed definitions and
+//! Please refer to [Life Wiki](http://www.conwaylife.com/wiki/Rulestring) for detailed definitions and
 //! notations of these rule strings.
 //!
 //! # Example:
@@ -39,8 +39,8 @@
 //!     s: Vec<u8>,
 //! }
 //!
-//! // Implement the parser trait for your rule:
-//! // The trait depends on the type of rules you want to parse.
+//! // Implement a parser trait for your rule:
+//! // The choice of the trait depends on the type of rules you want to parse.
 //! impl ParseLife for Rule {
 //!     // Implement a function to construct the rule from b and s data:
 //!     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {

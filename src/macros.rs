@@ -283,3 +283,46 @@ macro_rules! parse_bs {
         }
     };
 }
+
+macro_rules! impl_parser {
+    (
+        $trait_name: ident and $trait_name_gen: ident for $struct_name: ident,
+        $f: expr,
+        $n: expr $(,)?) => {
+        impl $trait_name for $struct_name {
+            fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
+                let mut new_b = Vec::new();
+                let mut new_s = Vec::new();
+                let f = $f;
+                for i in 0_u8..=$n {
+                    let j = f(i);
+                    if b.contains(&j) {
+                        new_b.push(i);
+                    }
+                    if s.contains(&j) {
+                        new_s.push(i);
+                    }
+                }
+                $struct_name::from_bs(new_b, new_s)
+            }
+        }
+
+        impl $trait_name_gen for Gen<$struct_name> {
+            fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
+                let mut new_b = Vec::new();
+                let mut new_s = Vec::new();
+                let f = $f;
+                for i in 0_u8..=$n {
+                    let j = f(i);
+                    if b.contains(&j) {
+                        new_b.push(i);
+                    }
+                    if s.contains(&j) {
+                        new_s.push(i);
+                    }
+                }
+                $struct_name::from_bsg(new_b, new_s, gen)
+            }
+        }
+    };
+}

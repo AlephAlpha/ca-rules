@@ -8,39 +8,11 @@ use crate::ParseRuleError;
 
 rule_struct!(NtNeumann);
 
-impl ParseNeumann for NtNeumann {
-    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0x0f {
-            let j = i.count_ones() as u8;
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtNeumann::from_bs(new_b, new_s)
-    }
-}
-
-impl ParseNeumannGen for Gen<NtNeumann> {
-    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0x0f {
-            let j = i.count_ones() as u8;
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtNeumann::from_bsg(new_b, new_s, gen)
-    }
-}
+impl_parser!(
+    ParseNeumann and ParseNeumannGen for NtNeumann,
+    |i: u8| i.count_ones() as u8,
+    0x0f,
+);
 
 /// A trait for parsing non-totalistic rules with
 /// [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).

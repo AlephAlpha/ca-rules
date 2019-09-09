@@ -13,7 +13,7 @@
 * [Totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)，如 `B2/S34H`
 * [Isotropic non-totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)，如 `B2o3-o4m/S12m3o4m5H`
 * [von Neumann 邻域](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood)，如 `B2/S013V`
-* 以上规则对于的 [Generations](http://www.conwaylife.com/wiki/Generations) 规则，如 `3457/357/5`
+* 以上规则对应的 [Generations](http://www.conwaylife.com/wiki/Generations) 规则，如 `3457/357/5`
 
 对于非 Generations 的规则，支持 [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)（如 `B3/S23`）和 [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)（如 `3/23`）。
 
@@ -24,7 +24,7 @@
 * [Catagolue](https://catagolue.appspot.com/rules/generations) 的写法（`g5b357s3457`）
 
 
-这些规则的具体定义和记号可见 [Life Wiki](www.conwaylife.com/wiki/Rulestring)。
+这些规则的具体定义和记号可见 [Life Wiki](http://www.conwaylife.com/wiki/Rulestring)。
 
 ## 用法
 

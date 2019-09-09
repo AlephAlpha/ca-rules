@@ -41,39 +41,11 @@ impl NtHex {
     parse_rule!('H');
 }
 
-impl ParseHex for NtHex {
-    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0x3f {
-            let j = i.count_ones() as u8;
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtHex::from_bs(new_b, new_s)
-    }
-}
-
-impl ParseHexGen for Gen<NtHex> {
-    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0x3f {
-            let j = i.count_ones() as u8;
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtHex::from_bsg(new_b, new_s, gen)
-    }
-}
+impl_parser!(
+    ParseHex and ParseHexGen for NtHex,
+    |i: u8| i.count_ones() as u8,
+    0x3f,
+);
 
 /// A trait for parsing [non-totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
 ///

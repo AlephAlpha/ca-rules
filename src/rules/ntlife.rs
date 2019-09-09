@@ -85,107 +85,23 @@ impl NtLife {
     parse_rule!();
 }
 
-impl ParseLife for NtLife {
-    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0xff {
-            let j = i.count_ones() as u8;
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtLife::from_bs(new_b, new_s)
-    }
-}
+impl_parser!(
+    ParseLife and ParseLifeGen for NtLife,
+    |i: u8| i.count_ones() as u8,
+    0xff,
+);
 
-impl ParseLifeGen for Gen<NtLife> {
-    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0xff {
-            let j = i.count_ones() as u8;
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtLife::from_bsg(new_b, new_s, gen)
-    }
-}
+impl_parser!(
+    ParseNtHex and ParseNtHexGen for NtLife,
+    |i: u8| (i & 0xc0) >> 2 | (i & 0x18) >> 1 | (i & 0x03),
+    0xff,
+);
 
-impl ParseNtHex for NtLife {
-    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0xff {
-            let j = (i & 0xc0) >> 2 | (i & 0x18) >> 1 | (i & 0x03);
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtLife::from_bs(new_b, new_s)
-    }
-}
-
-impl ParseNtHexGen for Gen<NtLife> {
-    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0xff {
-            let j = (i & 0xc0) >> 2 | (i & 0x18) >> 1 | (i & 0x03);
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtLife::from_bsg(new_b, new_s, gen)
-    }
-}
-
-impl ParseNtNeumann for NtLife {
-    fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0xff {
-            let j = (i & 0x40) >> 3 | (i & 0x18) >> 2 | (i & 0x02) >> 1;
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtLife::from_bs(new_b, new_s)
-    }
-}
-
-impl ParseNtNeumannGen for Gen<NtLife> {
-    fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self {
-        let mut new_b = Vec::new();
-        let mut new_s = Vec::new();
-        for i in 0_u8..=0xff {
-            let j = (i & 0x40) >> 3 | (i & 0x18) >> 2 | (i & 0x02) >> 1;
-            if b.contains(&j) {
-                new_b.push(i);
-            }
-            if s.contains(&j) {
-                new_s.push(i);
-            }
-        }
-        NtLife::from_bsg(new_b, new_s, gen)
-    }
-}
+impl_parser!(
+    ParseNtNeumann and ParseNtNeumannGen for NtLife,
+    |i: u8| (i & 0x40) >> 3 | (i & 0x18) >> 2 | (i & 0x02) >> 1,
+    0xff,
+);
 
 /// A trait for parsing [non-totalistic life-like rules](http://www.conwaylife.com/wiki/Non-totalistic_Life-like_cellular_automaton).
 ///

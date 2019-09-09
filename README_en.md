@@ -29,7 +29,7 @@ For Generations rules, three different notations are supported:
 * The notation used by [Golly](http://golly.sourceforge.net/Help/Algorithms/Generations.html) (`3457/357/5`)
 * The notation used by [Catagolue](https://catagolue.appspot.com/rules/generations) (`g5b357s3457`)
 
-Please refer to [Life Wiki](www.conwaylife.com/wiki/Rulestring) for detailed definitions and
+Please refer to [Life Wiki](http://www.conwaylife.com/wiki/Rulestring) for detailed definitions and
 notations of these rule strings.
 
 ## Example:

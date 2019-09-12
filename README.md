@@ -10,18 +10,29 @@
 
 * [Totalistic Life-like](http://www.conwaylife.com/wiki/Totalistic_Life-like_cellular_automaton)，如 `B3/S23`
 * [Isotropic non-totalistic Life-like](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton)，如 `B35y/S1e2-ci3-a5i`
+* [Non-isotropic Life-like](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)，如 `MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA`
 * [Totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)，如 `B2/S34H`
 * [Isotropic non-totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)，如 `B2o3-o4m/S12m3o4m5H`
+* [Non-isotropic Hexagonal](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)，如 `MAPFgFoF2gXgH5oF4B+gH4A6AH`
 * [von Neumann 邻域](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood)，如 `B2/S013V`
+* [Non-isotropic von Neumann](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)，如 `MAPHmlphg`.
 * 以上规则对应的 [Generations](http://www.conwaylife.com/wiki/Generations) 规则，如 `3457/357/5`
 
-对于非 Generations 的规则，支持 [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)（如 `B3/S23`）和 [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)（如 `3/23`）。
+对于非 Generations 的规则，支持以下三种写法：
+* [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)（`B3/S23`）
+* [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)（`3/23`）
+* [MAP strings](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton) 
+  （用于 [Non-isotropic Life-like](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton) 的规则，
+  如 `MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA`）
 
-对于 Generations 规则，支持以下三种写法：
+对于 Generations 规则，支持以下四种写法：
 
 * B/S/C（`B357/S3457/C5`）
 * [Golly](http://golly.sourceforge.net/Help/Algorithms/Generations.html) 的写法（`3457/357/5`）
 * [Catagolue](https://catagolue.appspot.com/rules/generations) 的写法（`g5b357s3457`）
+* [MAP strings](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+  （用于 [Non-isotropic Life-like](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton) 的规则，
+  如 `MAPARYBFxZpF38WaRd/aZZ//hZpF39pln/+aZZ//pZp/ukWaRd/aZZ//mmWf/6Waf7paZZ//pZp/umWaf7paZbplg/5`）
 
 
 这些规则的具体定义和记号可见 [Life Wiki](http://www.conwaylife.com/wiki/Rulestring)。

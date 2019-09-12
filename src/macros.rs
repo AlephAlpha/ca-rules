@@ -10,15 +10,39 @@ macro_rules! rule_struct {
         }
 
         impl $name {
+            /// Construct the struct from `b` / `s` data.
             fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
                 $name { b, s }
             }
 
+            /// Construct the Generations struct from `b` / `s` data and the number of states.
             fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Gen<Self> {
                 Gen {
                     rule: $name { b, s },
                     gen,
                 }
+            }
+
+            /// A parser for numbers.
+            fn parse_num<I>(chars: &mut std::iter::Peekable<I>) -> Result<usize, ParseRuleError>
+            where
+                I: Iterator<Item = char>,
+            {
+                let mut n = 0;
+                if chars.peek().is_none() || !chars.peek().unwrap().is_digit(10) {
+                    return Err(ParseRuleError::MissingNumber);
+                }
+                while let Some(&c) = chars.peek() {
+                    match c {
+                        c if c.is_digit(10) => {
+                            chars.next();
+                            n *= 10;
+                            n += c.to_digit(10).unwrap() as usize;
+                        }
+                        _ => return Ok(n),
+                    }
+                }
+                Ok(n)
             }
         }
     };
@@ -28,8 +52,7 @@ macro_rules! rule_struct {
 macro_rules! parse_rule {
     ($($suffix: expr)?) => {
         /// A parser for the struct.
-        fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
-        {
+        fn parse_rule(input: &str) -> Result<Self, ParseRuleError> {
             let mut chars = input.chars().peekable();
             let (b, s);
 
@@ -75,9 +98,8 @@ macro_rules! parse_rule {
             }
         }
 
-        /// A parser for the struct.
-        fn parse_rule_gen(input: &str) -> Result<Gen<Self>, ParseRuleError>
-        {
+        /// A parser for the Generations struct.
+        fn parse_rule_gen(input: &str) -> Result<Gen<Self>, ParseRuleError> {
             let mut chars = input.chars().peekable();
             let (b, s);
             let mut gen = 2;
@@ -164,41 +186,20 @@ macro_rules! parse_rule {
 
             if gen < 2 {
                 Err(ParseRuleError::GenLessThan2)
-            } else {match chars.next() {
+            } else {
+                match chars.next() {
                     None => Ok(Self::from_bsg(b, s, gen)),
                     _ => Err(ParseRuleError::ExtraJunk),
                 }
             }
         }
-
-        /// A parser for numbers.
-        fn parse_num<I>(chars: &mut std::iter::Peekable<I>) -> Result<usize, ParseRuleError>
-        where
-            I: Iterator<Item = char>,
-        {
-            let mut n = 0;
-            if chars.peek().is_none() || !chars.peek().unwrap().is_digit(10) {
-                return Err(ParseRuleError::MissingNumber);
-            }
-            while let Some(&c) = chars.peek() {
-                match c {
-                    c if c.is_digit(10) => {
-                        chars.next();
-                        n *= 10;
-                        n += c.to_digit(10).unwrap() as usize;
-                    }
-                    _ => return Ok(n),
-                }
-            }
-            Ok(n)
-        }
     };
 }
 
-/// A macro to define a function to parse `b` or `s` data.
+/// A macro to define a function to parse `b` / `s` data.
 macro_rules! parse_bs {
     ($n: expr) => {
-        /// A parser for `b` or `s` data.
+        /// A parser for `b` / `s` data.
         fn parse_bs<I>(chars: &mut std::iter::Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
         where
             I: Iterator<Item = char>,
@@ -221,6 +222,7 @@ macro_rules! parse_bs {
     };
 
     { $($count: expr => { $($key: expr => $value: expr),* $(,)? }),*  $(,)? } => {
+        /// A parser for `b` / `s` data.
         fn parse_bs<I>(chars: &mut std::iter::Peekable<I>) -> Result<Vec<u8>, ParseRuleError>
         where
             I: Iterator<Item = char>,
@@ -284,11 +286,96 @@ macro_rules! parse_bs {
     };
 }
 
+/// A macro to define a function to parse MAP strings.
+macro_rules! parse_rule_map {
+    ($n: expr) => {
+        /// A parser for the struct that parses MAP strings.
+        fn parse_rule_map(input: &str) -> Result<Self, ParseRuleError> {
+            const CENTER_MARK: usize = 1 << ($n / 2);
+            const RIGHT_MARK: usize = CENTER_MARK - 1;
+            const LEFT_MARK: usize = RIGHT_MARK << ($n / 2 + 1);
+            if !input.starts_with("MAP") {
+                return Err(ParseRuleError::NotMapRule);
+            }
+            let bytes = base64::decode(&input[3..]).map_err(|_| ParseRuleError::Base64Error)?;
+            if bytes.len() * 8 != 2 << $n {
+                return Err(ParseRuleError::InvalidLength);
+            }
+            let mut b = Vec::new();
+            let mut s = Vec::new();
+            for (i, x) in bytes.iter().map(|x| x.reverse_bits()).enumerate() {
+                for j in 0..8 {
+                    if x & (1 << j) != 0 {
+                        let k = i * 8 + j;
+                        let n = ((k & LEFT_MARK) >> 1 | (k & RIGHT_MARK)) as u8;
+                        if k & CENTER_MARK == 0 {
+                            b.push(n);
+                        } else {
+                            s.push(n);
+                        }
+                    }
+                }
+            }
+            Ok(Self::from_bs(b, s))
+        }
+
+        /// A parser for the Generations struct that parses MAP strings.
+        fn parse_rule_gen_map(input: &str) -> Result<Gen<Self>, ParseRuleError> {
+            const CENTER_MARK: usize = 1 << ($n / 2);
+            const RIGHT_MARK: usize = CENTER_MARK - 1;
+            const LEFT_MARK: usize = RIGHT_MARK << ($n / 2 + 1);
+            let mut gen = 2;
+            let mut slash = input.len();
+            if !input.starts_with("MAP") {
+                return Err(ParseRuleError::NotMapRule);
+            }
+            if let Some(n) = input.rfind('/') {
+                if (n - 3) * 6 >= 2 << $n {
+                    slash = n;
+                    let mut chars = input[n + 1..].chars().peekable();
+                    if chars.peek().is_some() {
+                        gen = Self::parse_num(&mut chars)?;
+                        if chars.next().is_some() {
+                            return Err(ParseRuleError::ExtraJunk);
+                        }
+                    }
+                }
+            }
+            let bytes =
+                base64::decode(&input[3..slash]).map_err(|_| ParseRuleError::Base64Error)?;
+            if bytes.len() * 8 != 2 << $n {
+                return Err(ParseRuleError::InvalidLength);
+            }
+            let mut b = Vec::new();
+            let mut s = Vec::new();
+            for (i, x) in bytes.iter().map(|x| x.reverse_bits()).enumerate() {
+                for j in 0..8 {
+                    if x & (1 << j) != 0 {
+                        let k = i * 8 + j;
+                        let n = ((k & LEFT_MARK) >> 1 | (k & RIGHT_MARK)) as u8;
+                        if k & CENTER_MARK == 0 {
+                            b.push(n);
+                        } else {
+                            s.push(n);
+                        }
+                    }
+                }
+            }
+            Ok(Self::from_bsg(b, s, gen))
+        }
+    };
+}
+
+/// A macro for implementing traits for helper structs.
+///
+/// `$f` is a function that converts the `b` / `s` data of the struct to those of the trait.
+/// `$n` is the upper bound of `b` / `s` data of the struct.
 macro_rules! impl_parser {
     (
-        $trait_name: ident and $trait_name_gen: ident for $struct_name: ident,
+        ($trait_name: ident, $trait_name_gen: ident) for $struct_name: ident,
         $f: expr,
-        $n: expr $(,)?) => {
+        $n: expr $(,)?
+    ) => {
         impl $trait_name for $struct_name {
             fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self {
                 let mut new_b = Vec::new();

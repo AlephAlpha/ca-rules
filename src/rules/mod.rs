@@ -15,7 +15,7 @@ pub use ntlife::{ParseNtLife, ParseNtLifeGen};
 pub use ntneumann::{ParseNtNeumann, ParseNtNeumannGen};
 
 /// A helper struct to represent Generations rules.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 struct Gen<T> {
     rule: T,
     gen: usize,

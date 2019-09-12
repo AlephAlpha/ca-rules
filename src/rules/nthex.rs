@@ -39,15 +39,19 @@ impl NtHex {
         },
     }
     parse_rule!('H');
+    parse_rule_map!(6);
 }
 
 impl_parser!(
-    ParseHex and ParseHexGen for NtHex,
+    (ParseHex, ParseHexGen) for NtHex,
     |i: u8| i.count_ones() as u8,
     0x3f,
 );
 
 /// A trait for parsing [non-totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
+/// Both [isotropic](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton)
+/// and [non-isotropic](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+/// rules are supported.
 ///
 /// The `b` / `s` data of this type of rules consists of possible combinations of
 /// states of the 6 neighbors, represented by an 8-bit binary number,
@@ -82,19 +86,34 @@ impl_parser!(
 /// assert!(life.s.contains(&0x2a));
 /// ```
 pub trait ParseNtHex {
+    /// Construct the rule from `b` / `s` data.
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
+    /// The parser.
     fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
     where
         Self: Sized,
     {
-        let NtHex { b, s } = ParseHex::parse_rule(input).or_else(|_| NtHex::parse_rule(input))?;
+        let NtHex { b, s } = ParseHex::parse_rule(input)
+            .or_else(|_| NtHex::parse_rule(input))
+            .or_else(|e| {
+                NtHex::parse_rule_map(input).map_err(|e_map| {
+                    if let ParseRuleError::NotMapRule = e_map {
+                        e
+                    } else {
+                        e_map
+                    }
+                })
+            })?;
         Ok(Self::from_bs(b, s))
     }
 }
 
 /// A trait for parsing [non-totalistic hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)
 /// [Generations](http://www.conwaylife.com/wiki/Generations) rules.
+/// Both [isotropic](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton)
+/// and [non-isotropic](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+/// rules are supported.
 ///
 /// The `b` / `s` data of this type of rules consists of possible combinations of
 /// states of the 6 neighbors, represented by an 8-bit binary number,
@@ -130,8 +149,10 @@ pub trait ParseNtHex {
 /// assert_eq!(life.gen, 3);
 /// ```
 pub trait ParseNtHexGen {
+    /// Construct the rule from `b` / `s` data and the number of states.
     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
 
+    /// The parser.
     fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
     where
         Self: Sized,
@@ -139,7 +160,17 @@ pub trait ParseNtHexGen {
         let Gen {
             rule: NtHex { b, s },
             gen,
-        } = ParseHexGen::parse_rule(input).or_else(|_| NtHex::parse_rule_gen(input))?;
+        } = ParseHexGen::parse_rule(input)
+            .or_else(|_| NtHex::parse_rule_gen(input))
+            .or_else(|e| {
+                NtHex::parse_rule_gen_map(input).map_err(|e_map| {
+                    if let ParseRuleError::NotMapRule = e_map {
+                        e
+                    } else {
+                        e_map
+                    }
+                })
+            })?;
         Ok(Self::from_bsg(b, s, gen))
     }
 }
@@ -162,6 +193,7 @@ mod tests {
         Rule::parse_rule("b2os24mh")?;
         Rule::parse_rule("12m3o4m5/2o3-o4mH")?;
         Rule::parse_rule("B2o3p4-o5/S2-p3p45H")?;
+        Rule::parse_rule("MAPFgFoF2gXgH5oF4B+gH4A6A")?;
         Ok(())
     }
 
@@ -183,6 +215,10 @@ mod tests {
             Rule::parse_rule("B2o3p4-o5-p/S2-p3p45H").err(),
             Some(ParseRuleError::Missing('S'))
         );
+        assert_eq!(
+            Rule::parse_rule("MAPFgFoF2gXgH5oF4B+gH4A6AH").err(),
+            Some(ParseRuleError::Base64Error)
+        );
         Ok(())
     }
 
@@ -196,6 +232,14 @@ mod tests {
         for s in 0..=0x3f {
             assert_eq!(rule.s.contains(&s), [3, 4].contains(&s.count_ones()));
         }
+        Ok(())
+    }
+
+    #[test]
+    fn parse_map() -> Result<(), ParseRuleError> {
+        let rule1: NtHex = NtHex::parse_rule("B2/S34H")?;
+        let rule2: NtHex = NtHex::parse_rule_map("MAPFgFoF2gXgH5oF4B+gH4A6A")?;
+        assert_eq!(rule1, rule2);
         Ok(())
     }
 }

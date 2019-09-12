@@ -83,27 +83,31 @@ impl NtLife {
         },
     }
     parse_rule!();
+    parse_rule_map!(8);
 }
 
 impl_parser!(
-    ParseLife and ParseLifeGen for NtLife,
+    (ParseLife, ParseLifeGen) for NtLife,
     |i: u8| i.count_ones() as u8,
     0xff,
 );
 
 impl_parser!(
-    ParseNtHex and ParseNtHexGen for NtLife,
+    (ParseNtHex, ParseNtHexGen) for NtLife,
     |i: u8| (i & 0xc0) >> 2 | (i & 0x18) >> 1 | (i & 0x03),
     0xff,
 );
 
 impl_parser!(
-    ParseNtNeumann and ParseNtNeumannGen for NtLife,
+    (ParseNtNeumann, ParseNtNeumannGen) for NtLife,
     |i: u8| (i & 0x40) >> 3 | (i & 0x18) >> 2 | (i & 0x02) >> 1,
     0xff,
 );
 
 /// A trait for parsing [non-totalistic life-like rules](http://www.conwaylife.com/wiki/Non-totalistic_Life-like_cellular_automaton).
+/// Both [isotropic](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton)
+/// and [non-isotropic](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+/// rules are supported.
 ///
 /// The `b` / `s` data of this type of rules consists of possible combinations of
 /// states of the 8 neighbors, represented by an 8-bit binary number,
@@ -138,8 +142,10 @@ impl_parser!(
 /// assert!(life.s.contains(&0x2a));
 /// ```
 pub trait ParseNtLife {
+    /// Construct the rule from `b` / `s` data.
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
+    /// The parser.
     fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
     where
         Self: Sized,
@@ -147,13 +153,25 @@ pub trait ParseNtLife {
         let NtLife { b, s } = ParseLife::parse_rule(input)
             .or_else(|_| NtLife::parse_rule(input))
             .or_else(|e| ParseNtHex::parse_rule(input).map_err(|_| e))
-            .or_else(|e| ParseNtNeumann::parse_rule(input).map_err(|_| e))?;
+            .or_else(|e| ParseNtNeumann::parse_rule(input).map_err(|_| e))
+            .or_else(|e| {
+                NtLife::parse_rule_map(input).map_err(|e_map| {
+                    if let ParseRuleError::NotMapRule = e_map {
+                        e
+                    } else {
+                        e_map
+                    }
+                })
+            })?;
         Ok(Self::from_bs(b, s))
     }
 }
 
 /// A trait for parsing [non-totalistic life-like](http://www.conwaylife.com/wiki/Non-totalistic_Life-like_cellular_automaton)
 /// [Generations](http://www.conwaylife.com/wiki/Generations) rules.
+/// Both [isotropic](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton)
+/// and [non-isotropic](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+/// rules are supported.
 ///
 /// The `b` / `s` data of this type of rules consists of possible combinations of
 /// states of the 8 neighbors, represented by an 8-bit binary number,
@@ -189,8 +207,10 @@ pub trait ParseNtLife {
 /// assert_eq!(life.gen, 4);
 /// ```
 pub trait ParseNtLifeGen {
+    /// Construct the rule from `b` / `s` data and the number of states.
     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
 
+    /// The parser.
     fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
     where
         Self: Sized,
@@ -201,7 +221,16 @@ pub trait ParseNtLifeGen {
         } = ParseLifeGen::parse_rule(input)
             .or_else(|_| NtLife::parse_rule_gen(input))
             .or_else(|e| ParseNtHexGen::parse_rule(input).map_err(|_| e))
-            .or_else(|e| ParseNtNeumannGen::parse_rule(input).map_err(|_| e))?;
+            .or_else(|e| ParseNtNeumannGen::parse_rule(input).map_err(|_| e))
+            .or_else(|e| {
+                NtLife::parse_rule_gen_map(input).map_err(|e_map| {
+                    if let ParseRuleError::NotMapRule = e_map {
+                        e
+                    } else {
+                        e_map
+                    }
+                })
+            })?;
         Ok(Self::from_bsg(b, s, gen))
     }
 }
@@ -225,8 +254,11 @@ mod tests {
         Rule::parse_rule("B2e3-anq/S12-a3")?;
         Rule::parse_rule("B35y/S1e2-ci3-a5i")?;
         Rule::parse_rule("B2o3p4-o5/S2-p3p45H")?;
+        Rule::parse_rule("MAPFgFoF2gXgH5oF4B+gH4A6A")?;
         Rule::parse_rule("B2i34cj6a7c8/S2-i3-a4ceit6in")?;
         Rule::parse_rule("1e2cik3ejqry4anrwz5a6k/2c3aenq4aijryz5cikqr6ac8")?;
+        Rule::parse_rule("MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA")?;
+        Rule::parse_rule("MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA==")?;
         Ok(())
     }
 
@@ -247,6 +279,14 @@ mod tests {
         assert_eq!(
             Rule::parse_rule("B2c3aenq4aijryz5cikqrz6ac8/S1e2cik3ejqry4anrwz5a6k").err(),
             Some(ParseRuleError::Missing('S'))
+        );
+        assert_eq!(
+            Rule::parse_rule("MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIA").err(),
+            Some(ParseRuleError::InvalidLength)
+        );
+        assert_eq!(
+            Rule::parse_rule("MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAX").err(),
+            Some(ParseRuleError::Base64Error)
         );
         Ok(())
     }
@@ -299,6 +339,22 @@ mod tests {
                 [0, 1, 3].contains(&(s & 0b0101_1010).count_ones())
             );
         }
+        Ok(())
+    }
+
+    #[test]
+    fn parse_map() -> Result<(), ParseRuleError> {
+        let rule1: NtLife = NtLife::parse_rule("B3/S23")?;
+        let rule2: NtLife = NtLife::parse_rule_map("MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA")?;
+        assert_eq!(rule1, rule2);
+        Ok(())
+    }
+
+    #[test]
+    fn parse_gen_map() -> Result<(), ParseRuleError> {
+        let rule1: Gen<NtLife> = NtLife::parse_rule_gen("3457/357/5")?;
+        let rule2: Gen<NtLife> = NtLife::parse_rule_gen_map("MAPARYBFxZpF38WaRd/aZZ//hZpF39pln/+aZZ//pZp/ukWaRd/aZZ//mmWf/6Waf7paZZ//pZp/umWaf7paZbplg/5")?;
+        assert_eq!(rule1, rule2);
         Ok(())
     }
 }

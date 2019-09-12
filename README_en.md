@@ -10,24 +10,36 @@ Currently the following rules are supported:
   e.g., `B3/S23`.
 * [Isotropic non-totalistic Life-like](http://www.conwaylife.com/wiki/Isotropic_non-totalistic_Life-like_cellular_automaton),
   e.g., `B2ci3ai4c8/S02ae3eijkq4iz5ar6i7e`.
+* [Non-isotropic Life-like](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton),
+  e.g., `MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA`.
 * [Totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood),
   e.g., `B2/S34H`.
 * [Isotropic non-totalistic Hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood),
   e.g., `B2o3-o4m/S12m3o4m5H`.
-* [von Neumann neighbourhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood),
+* [Non-isotropic Hexagonal](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton),
+  e.g., `MAPFgFoF2gXgH5oF4B+gH4A6AH`.
+* [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood),
   e.g., `B2/S013V`.
+* [Non-isotropic von Neumann](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton),
+  e.g., `MAPHmlphg`.
 * The corresponding [Generations rules](http://www.conwaylife.com/wiki/Generations)
 of the above rules, e.g., `3457/357/5`.
 
-For non-Generations rules, both [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)
-(`B3/S23`) and [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)
-(`23/3`) are supported.
+For non-Generations rules, four different notations are supported:
+* [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation) (`B3/S23`)
+* [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation) (`23/3`)
+* [MAP strings](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+  for [non-isotropic rules](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+  (`MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA`)
 
-For Generations rules, three different notations are supported:
+For Generations rules, four different notations are supported:
 
 * B/S notation (`B357/S3457/C5`)
 * The notation used by [Golly](http://golly.sourceforge.net/Help/Algorithms/Generations.html) (`3457/357/5`)
 * The notation used by [Catagolue](https://catagolue.appspot.com/rules/generations) (`g5b357s3457`)
+* [MAP strings](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+  for [non-isotropic rules](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
+  (`MAPARYBFxZpF38WaRd/aZZ//hZpF39pln/+aZZ//pZp/ukWaRd/aZZ//mmWf/6Waf7paZZ//pZp/umWaf7paZbplg/5`)
 
 Please refer to [Life Wiki](http://www.conwaylife.com/wiki/Rulestring) for detailed definitions and
 notations of these rule strings.

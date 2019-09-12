@@ -18,6 +18,12 @@ pub enum ParseRuleError {
     ExtraJunk,
     /// Number of states less than 2 in Generations rule
     GenLessThan2,
+    /// Not a MAP rule
+    NotMapRule,
+    /// An error occurs when decoding the base64 string
+    Base64Error,
+    /// Invalid length for MAP rule
+    InvalidLength,
 }
 
 impl Display for ParseRuleError {
@@ -32,6 +38,11 @@ impl Display for ParseRuleError {
             ParseRuleError::GenLessThan2 => {
                 "Number of states less than 2 in Generations rule".to_string()
             }
+            ParseRuleError::NotMapRule => "Not a MAP rule".to_string(),
+            ParseRuleError::Base64Error => {
+                "An error occurs when decoding the base64 string".to_string()
+            }
+            ParseRuleError::InvalidLength => "Invalid length for MAP rule".to_string(),
         };
         write!(f, "{}", message)
     }

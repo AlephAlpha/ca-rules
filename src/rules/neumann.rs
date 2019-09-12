@@ -44,8 +44,10 @@ impl Neumann {
 /// )
 /// ```
 pub trait ParseNeumann {
+    /// Construct the rule from `b` / `s` data.
     fn from_bs(b: Vec<u8>, s: Vec<u8>) -> Self;
 
+    /// The parser.
     fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
     where
         Self: Sized,
@@ -91,8 +93,10 @@ pub trait ParseNeumann {
 /// )
 /// ```
 pub trait ParseNeumannGen {
+    /// Construct the rule from `b` / `s` data and the number of states.
     fn from_bsg(b: Vec<u8>, s: Vec<u8>, gen: usize) -> Self;
 
+    /// The parser.
     fn parse_rule(input: &str) -> Result<Self, ParseRuleError>
     where
         Self: Sized,

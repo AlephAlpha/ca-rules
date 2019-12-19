@@ -28,7 +28,7 @@ macro_rules! rule_struct {
             where
                 I: Iterator<Item = char>,
             {
-                let mut n = 0;
+                let mut n: usize = 0;
                 if chars.peek().is_none() || !chars.peek().unwrap().is_digit(10) {
                     return Err(ParseRuleError::MissingNumber);
                 }
@@ -36,8 +36,11 @@ macro_rules! rule_struct {
                     match c {
                         c if c.is_digit(10) => {
                             chars.next();
-                            n *= 10;
-                            n += c.to_digit(10).unwrap() as usize;
+                            n = n
+                                .checked_mul(10)
+                                .ok_or(ParseRuleError::GenOverflow)?
+                                .checked_add(c.to_digit(10).unwrap() as usize)
+                                .ok_or(ParseRuleError::GenOverflow)?;
                         }
                         _ => return Ok(n),
                     }

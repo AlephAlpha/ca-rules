@@ -189,6 +189,10 @@ mod tests {
             GenRule::parse_rule("2333").err(),
             Some(ParseRuleError::Missing('/'))
         );
+        assert_eq!(
+            GenRule::parse_rule("23/3/18446744073709551617").err(),
+            Some(ParseRuleError::GenOverflow)
+        );
         Ok(())
     }
 }

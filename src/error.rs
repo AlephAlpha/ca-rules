@@ -24,27 +24,31 @@ pub enum ParseRuleError {
     Base64Error,
     /// Invalid length for MAP rule
     InvalidLength,
+    /// Generations number overflow for Generations rule
+    GenOverflow,
 }
 
 impl Display for ParseRuleError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let message = match self {
-            ParseRuleError::Missing(c) => format!("Missing expected {:?}", c),
-            ParseRuleError::MissingNumber => "Missing expected number".to_string(),
-            ParseRuleError::Unexpected(c) => format!("Unexpected {:?}", c),
+        match self {
+            ParseRuleError::Missing(c) => write!(f, "Missing expected {:?}", c),
+            ParseRuleError::MissingNumber => write!(f, "Missing expected number"),
+            ParseRuleError::Unexpected(c) => write!(f, "Unexpected {:?}", c),
             ParseRuleError::ExtraJunk => {
-                "Extra unparsed junk at the end of the rule string".to_string()
+                write!(f, "Extra unparsed junk at the end of the rule string")
             }
             ParseRuleError::GenLessThan2 => {
-                "Number of states less than 2 in Generations rule".to_string()
+                write!(f, "Number of states less than 2 in Generations rule")
             }
-            ParseRuleError::NotMapRule => "Not a MAP rule".to_string(),
+            ParseRuleError::NotMapRule => write!(f, "Not a MAP rule"),
             ParseRuleError::Base64Error => {
-                "An error occurs when decoding the base64 string".to_string()
+                write!(f, "An error occurs when decoding the base64 string")
             }
-            ParseRuleError::InvalidLength => "Invalid length for MAP rule".to_string(),
-        };
-        write!(f, "{}", message)
+            ParseRuleError::InvalidLength => write!(f, "Invalid length for MAP rule"),
+            ParseRuleError::GenOverflow => {
+                write!(f, "Generations number overflow for Generations rule")
+            }
+        }
     }
 }
 

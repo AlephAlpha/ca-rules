@@ -26,6 +26,7 @@ Currently the following rules are supported:
 of the above rules, e.g., `3457/357/5`.
 
 For non-Generations rules, four different notations are supported:
+
 * [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation) (`B3/S23`)
 * [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation) (`23/3`)
 * [MAP strings](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
@@ -44,7 +45,7 @@ For Generations rules, four different notations are supported:
 Please refer to [Life Wiki](http://www.conwaylife.com/wiki/Rulestring) for detailed definitions and
 notations of these rule strings.
 
-## Example:
+## Usage
 
 ```rust
 use ca_rules::ParseLife;

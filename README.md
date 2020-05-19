@@ -19,9 +19,10 @@
 * 以上规则对应的 [Generations](http://www.conwaylife.com/wiki/Generations) 规则，如 `3457/357/5`
 
 对于非 Generations 的规则，支持以下三种写法：
+
 * [B/S notation](http://www.conwaylife.com/wiki/Rulestring#B.2FS_notation)（`B3/S23`）
 * [S/B notation](http://www.conwaylife.com/wiki/Rulestring#S.2FB_notation)（`3/23`）
-* [MAP strings](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton) 
+* [MAP strings](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
   （用于 [Non-isotropic Life-like](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton) 的规则，
   如 `MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA`）
 
@@ -33,7 +34,6 @@
 * [MAP strings](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton)
   （用于 [Non-isotropic Life-like](http://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton) 的规则，
   如 `MAPARYBFxZpF38WaRd/aZZ//hZpF39pln/+aZZ//pZp/ukWaRd/aZZ//mmWf/6Waf7paZZ//pZp/umWaf7paZbplg/5`）
-
 
 这些规则的具体定义和记号可见 [Life Wiki](http://www.conwaylife.com/wiki/Rulestring)。
 

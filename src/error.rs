@@ -1,55 +1,27 @@
 //! Errors that can be returned when parsing rule strings.
 
-use std::{
-    error::Error,
-    fmt::{self, Display, Formatter},
-};
+// use std::fmt::{self, Display, Formatter};
+use thiserror::Error;
 
 /// Errors that can be returned when parsing rule strings.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum ParseRuleError {
-    /// Missing an expected char
+    #[error("Missing expected {0:?}")]
     Missing(char),
-    /// Missing an expected number
+    #[error("Missing expected number")]
     MissingNumber,
-    /// An unexpected char
+    #[error("Unexpected {0:?}")]
     Unexpected(char),
-    /// Extra unparsed junk at the end of the rule string
+    #[error("Extra unparsed junk at the end of the rule string")]
     ExtraJunk,
-    /// Number of states less than 2 in Generations rule
+    #[error("Number of states less than 2 in Generations rule")]
     GenLessThan2,
-    /// Not a MAP rule
+    #[error("Not a MAP rule")]
     NotMapRule,
-    /// An error occurs when decoding the base64 string
+    #[error("Invalid Base64 encoding for MAP rule")]
     Base64Error,
-    /// Invalid length for MAP rule
+    #[error("Invalid length for MAP rule")]
     InvalidLength,
-    /// Generations number overflow for Generations rule
+    #[error("Generations number overflow for Generations rule")]
     GenOverflow,
 }
-
-impl Display for ParseRuleError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            ParseRuleError::Missing(c) => write!(f, "Missing expected {:?}", c),
-            ParseRuleError::MissingNumber => write!(f, "Missing expected number"),
-            ParseRuleError::Unexpected(c) => write!(f, "Unexpected {:?}", c),
-            ParseRuleError::ExtraJunk => {
-                write!(f, "Extra unparsed junk at the end of the rule string")
-            }
-            ParseRuleError::GenLessThan2 => {
-                write!(f, "Number of states less than 2 in Generations rule")
-            }
-            ParseRuleError::NotMapRule => write!(f, "Not a MAP rule"),
-            ParseRuleError::Base64Error => {
-                write!(f, "An error occurs when decoding the base64 string")
-            }
-            ParseRuleError::InvalidLength => write!(f, "Invalid length for MAP rule"),
-            ParseRuleError::GenOverflow => {
-                write!(f, "Generations number overflow for Generations rule")
-            }
-        }
-    }
-}
-
-impl Error for ParseRuleError {}

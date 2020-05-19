@@ -1,6 +1,6 @@
 [package]
 name = "ca-rules"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["AlephAlpha <alephalpha911@gmail.com>"]
 edition = "2018"
 description = "Parsing rule strings of life-like cellular automata."

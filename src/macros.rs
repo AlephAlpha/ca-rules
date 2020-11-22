@@ -219,7 +219,7 @@ macro_rules! parse_bs {
                 }
             }
 
-            bs.sort();
+            bs.sort_unstable();
             Ok(bs)
         }
     };
@@ -283,7 +283,7 @@ macro_rules! parse_bs {
                 }
             }
 
-            bs.sort();
+            bs.sort_unstable();
             Ok(bs)
         }
     };

@@ -139,7 +139,7 @@ mod tests {
     }
 
     #[test]
-    fn invalid_rules() -> Result<(), ParseRuleError> {
+    fn invalid_rules() {
         assert_eq!(
             Rule::parse_rule("B3/S23h").err(),
             Some(ParseRuleError::ExtraJunk)
@@ -156,7 +156,6 @@ mod tests {
             Rule::parse_rule("233").err(),
             Some(ParseRuleError::Missing('/'))
         );
-        Ok(())
     }
 
     #[test]
@@ -172,7 +171,7 @@ mod tests {
     }
 
     #[test]
-    fn invalid_rules_gen() -> Result<(), ParseRuleError> {
+    fn invalid_rules_gen() {
         assert_eq!(
             GenRule::parse_rule("B3/S23h").err(),
             Some(ParseRuleError::ExtraJunk)
@@ -193,6 +192,5 @@ mod tests {
             GenRule::parse_rule("23/3/18446744073709551617").err(),
             Some(ParseRuleError::GenOverflow)
         );
-        Ok(())
     }
 }

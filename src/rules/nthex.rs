@@ -198,7 +198,7 @@ mod tests {
     }
 
     #[test]
-    fn invalid_rules() -> Result<(), ParseRuleError> {
+    fn invalid_rules() {
         assert_eq!(
             Rule::parse_rule("B3/S23").err(),
             Some(ParseRuleError::Missing('H'))
@@ -219,7 +219,6 @@ mod tests {
             Rule::parse_rule("MAPFgFoF2gXgH5oF4B+gH4A6AH").err(),
             Some(ParseRuleError::Base64Error)
         );
-        Ok(())
     }
 
     #[test]

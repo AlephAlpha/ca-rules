@@ -132,7 +132,7 @@ mod tests {
     }
 
     #[test]
-    fn invalid_rules() -> Result<(), ParseRuleError> {
+    fn invalid_rules() {
         assert_eq!(
             Rule::parse_rule("B3/S23va").err(),
             Some(ParseRuleError::ExtraJunk)
@@ -153,6 +153,5 @@ mod tests {
             Rule::parse_rule("233v").err(),
             Some(ParseRuleError::Missing('/'))
         );
-        Ok(())
     }
 }

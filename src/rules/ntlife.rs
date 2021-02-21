@@ -263,7 +263,7 @@ mod tests {
     }
 
     #[test]
-    fn invalid_rules() -> Result<(), ParseRuleError> {
+    fn invalid_rules() {
         assert_eq!(
             Rule::parse_rule("12-a3/B2e3-anq").err(),
             Some(ParseRuleError::ExtraJunk)
@@ -288,7 +288,6 @@ mod tests {
             Rule::parse_rule("MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAX").err(),
             Some(ParseRuleError::Base64Error)
         );
-        Ok(())
     }
 
     #[test]

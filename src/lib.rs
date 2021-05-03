@@ -73,10 +73,14 @@
 
 mod error;
 mod macros;
+pub mod new_rules;
 mod rules;
+mod traits;
+mod util;
 
-pub use error::ParseRuleError;
+pub use error::{ConverRuleError, ParseRuleError};
 pub use rules::*;
+pub use traits::*;
 
 #[cfg(test)]
 mod test {

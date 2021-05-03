@@ -12,4 +12,6 @@ keywords = ["game-of-life", "cellular-automata", "parser"]
 
 [dependencies]
 base64 = "0.13.0"
+displaydoc = "0.2.1"
+fixedbitset = "0.4.0"
 thiserror = "1.0.24"

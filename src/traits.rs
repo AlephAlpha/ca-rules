@@ -148,7 +148,10 @@ pub trait ParseGenRule: Sized {
         }
 
         if let Some(suffix) = Self::SUFFIX {
-            if chars.next().map(|c| c.to_ascii_uppercase()) != Some(suffix.to_ascii_uppercase()) {
+            if chars
+                .next()
+                .map_or(true, |c| !c.eq_ignore_ascii_case(&suffix))
+            {
                 return Err(ParseRuleError::Missing(suffix));
             }
         }

@@ -1,10 +1,9 @@
 //! Totalistic life-like Generations rules.
 
 use crate::{
-    error::{ConverRuleError, ParseRuleError},
-    new_rules::life::{self, LifeRule},
-    traits::{ParseGenRule, PrintGenRule},
-    util::Bs::{self, B, S},
+    error::{ConvertRuleError, ParseRuleError},
+    new_rules::life::LifeRule,
+    traits::{ParseGenRule, PrintGenRule, TotalisticGen},
 };
 use fixedbitset::FixedBitSet;
 use std::{
@@ -24,6 +23,7 @@ use std::{
 ///
 /// ```
 /// use ca_rules::new_rules::LifeGenRule;
+/// use ca_rules::traits::*;
 ///
 /// let rule: LifeGenRule = "g5b357s3457".parse().unwrap();
 ///
@@ -43,33 +43,23 @@ pub struct LifeGenRule {
     gen: u32,
 }
 
-impl LifeGenRule {
-    /// Whether the rule contains this `b` data.
-    pub fn contains_b(&self, b: u8) -> bool {
-        self.data.contains(b as usize)
+impl TotalisticGen for LifeGenRule {
+    const NBHD_SIZE: usize = 9;
+
+    const SUFFIX: Option<char> = None;
+
+    #[inline]
+    fn from_data(data: FixedBitSet, gen: u32) -> Self {
+        Self { data, gen }
     }
 
-    /// Whether the rule contains this `s` data.
-    pub fn contains_s(&self, s: u8) -> bool {
-        self.data.contains(s as usize + 9)
+    #[inline]
+    fn data(&self) -> &FixedBitSet {
+        &self.data
     }
 
-    /// An iterator over the `b` data of the rule.
-    pub fn iter_b(&self) -> impl Iterator<Item = u8> + '_ {
-        self.data
-            .ones()
-            .filter_map(|bit| (bit < 9).then(|| bit as u8))
-    }
-
-    /// An iterator over the `s` data of the rule.
-    pub fn iter_s(&self) -> impl Iterator<Item = u8> + '_ {
-        self.data
-            .ones()
-            .filter_map(|bit| (bit >= 9).then(|| (bit - 9) as u8))
-    }
-
-    /// The generation number.
-    pub fn gen(&self) -> u32 {
+    #[inline]
+    fn gen(&self) -> u32 {
         self.gen
     }
 }
@@ -83,50 +73,11 @@ impl Default for LifeGenRule {
     }
 }
 
-impl ParseGenRule for LifeGenRule {
-    const DATA_SIZE: usize = 18;
-    const SUFFIX: Option<char> = None;
-
-    fn read_bs<I>(data: &mut FixedBitSet, chars: &mut std::iter::Peekable<I>, bs: Bs)
-    where
-        I: Iterator<Item = char>,
-    {
-        life::read_bs(data, chars, bs)
-    }
-
-    fn from_data(data: FixedBitSet, gen: u32) -> Self {
-        Self { data, gen }
-    }
-}
-
 impl FromStr for LifeGenRule {
     type Err = ParseRuleError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Self::parse_rule(s)
-    }
-}
-
-impl PrintGenRule for LifeGenRule {
-    const SUFFIX: Option<char> = None;
-
-    fn gen(&self) -> u32 {
-        self.gen
-    }
-
-    fn write_bs(&self, string: &mut String, bs: Bs) {
-        match bs {
-            B => {
-                for b in self.iter_b() {
-                    string.push(char::from_digit(b as u32, 9).unwrap());
-                }
-            }
-            S => {
-                for s in self.iter_s() {
-                    string.push(char::from_digit(s as u32, 9).unwrap());
-                }
-            }
-        }
     }
 }
 
@@ -146,11 +97,11 @@ impl From<LifeRule> for LifeGenRule {
 }
 
 impl TryFrom<LifeGenRule> for LifeRule {
-    type Error = ConverRuleError;
+    type Error = ConvertRuleError;
 
     fn try_from(rule: LifeGenRule) -> Result<Self, Self::Error> {
         if rule.gen != 2 {
-            Err(ConverRuleError::GenGreaterThan2)
+            Err(ConvertRuleError::GenGreaterThan2)
         } else {
             Ok(Self { data: rule.data })
         }

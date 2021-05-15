@@ -28,7 +28,7 @@ pub enum ParseRuleError {
 
 /// Errors that can be returned when converting rules.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Error)]
-pub enum ConverRuleError {
+pub enum ConvertRuleError {
     /// Generations number greater than 2 when converting to non-Generations rules.
     GenGreaterThan2,
 }

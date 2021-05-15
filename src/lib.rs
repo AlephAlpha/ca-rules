@@ -75,12 +75,14 @@ mod error;
 mod macros;
 pub mod new_rules;
 mod rules;
-mod traits;
+pub mod traits;
 mod util;
 
-pub use error::{ConverRuleError, ParseRuleError};
+pub use error::{ConvertRuleError, ParseRuleError};
+pub use new_rules::*;
 pub use rules::*;
 pub use traits::*;
+pub use util::Bs;
 
 #[cfg(test)]
 mod test {

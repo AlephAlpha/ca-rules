@@ -1,10 +1,9 @@
 //! Totalistic Generations rules with von Neumann neighborhood.
 
 use crate::{
-    error::{ConverRuleError, ParseRuleError},
-    new_rules::von::{self, VonRule},
-    traits::{ParseGenRule, PrintGenRule},
-    util::Bs::{self, B, S},
+    error::{ConvertRuleError, ParseRuleError},
+    new_rules::von::VonRule,
+    traits::{ParseGenRule, PrintGenRule, TotalisticGen},
 };
 use fixedbitset::FixedBitSet;
 use std::{
@@ -24,6 +23,7 @@ use std::{
 ///
 /// ```
 /// use ca_rules::new_rules::VonGenRule;
+/// use ca_rules::traits::*;
 ///
 /// let rule: VonGenRule = "g3b2s013V".parse().unwrap();
 ///
@@ -43,33 +43,23 @@ pub struct VonGenRule {
     gen: u32,
 }
 
-impl VonGenRule {
-    /// Whether the rule contains this `b` data.
-    pub fn contains_b(&self, b: u8) -> bool {
-        self.data.contains(b as usize)
+impl TotalisticGen for VonGenRule {
+    const NBHD_SIZE: usize = 5;
+
+    const SUFFIX: Option<char> = Some('V');
+
+    #[inline]
+    fn from_data(data: FixedBitSet, gen: u32) -> Self {
+        Self { data, gen }
     }
 
-    /// Whether the rule contains this `s` data.
-    pub fn contains_s(&self, s: u8) -> bool {
-        self.data.contains(s as usize + 5)
+    #[inline]
+    fn data(&self) -> &FixedBitSet {
+        &self.data
     }
 
-    /// An iterator over the `b` data of the rule.
-    pub fn iter_b(&self) -> impl Iterator<Item = u8> + '_ {
-        self.data
-            .ones()
-            .filter_map(|bit| (bit < 5).then(|| bit as u8))
-    }
-
-    /// An iterator over the `s` data of the rule.
-    pub fn iter_s(&self) -> impl Iterator<Item = u8> + '_ {
-        self.data
-            .ones()
-            .filter_map(|bit| (bit >= 5).then(|| (bit - 5) as u8))
-    }
-
-    /// The generation number.
-    pub fn gen(&self) -> u32 {
+    #[inline]
+    fn gen(&self) -> u32 {
         self.gen
     }
 }
@@ -83,22 +73,6 @@ impl Default for VonGenRule {
     }
 }
 
-impl ParseGenRule for VonGenRule {
-    const DATA_SIZE: usize = 10;
-    const SUFFIX: Option<char> = Some('V');
-
-    fn read_bs<I>(data: &mut FixedBitSet, chars: &mut std::iter::Peekable<I>, bs: Bs)
-    where
-        I: Iterator<Item = char>,
-    {
-        von::read_bs(data, chars, bs)
-    }
-
-    fn from_data(data: FixedBitSet, gen: u32) -> Self {
-        Self { data, gen }
-    }
-}
-
 impl FromStr for VonGenRule {
     type Err = ParseRuleError;
 
@@ -106,30 +80,6 @@ impl FromStr for VonGenRule {
         Self::parse_rule(s)
     }
 }
-
-impl PrintGenRule for VonGenRule {
-    const SUFFIX: Option<char> = Some('V');
-
-    fn gen(&self) -> u32 {
-        self.gen
-    }
-
-    fn write_bs(&self, string: &mut String, bs: Bs) {
-        match bs {
-            B => {
-                for b in self.iter_b() {
-                    string.push(char::from_digit(b as u32, 5).unwrap());
-                }
-            }
-            S => {
-                for s in self.iter_s() {
-                    string.push(char::from_digit(s as u32, 5).unwrap());
-                }
-            }
-        }
-    }
-}
-
 impl Display for VonGenRule {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         f.write_str(&self.to_string_sbg())
@@ -146,11 +96,11 @@ impl From<VonRule> for VonGenRule {
 }
 
 impl TryFrom<VonGenRule> for VonRule {
-    type Error = ConverRuleError;
+    type Error = ConvertRuleError;
 
     fn try_from(rule: VonGenRule) -> Result<Self, Self::Error> {
         if rule.gen != 2 {
-            Err(ConverRuleError::GenGreaterThan2)
+            Err(ConvertRuleError::GenGreaterThan2)
         } else {
             Ok(Self { data: rule.data })
         }

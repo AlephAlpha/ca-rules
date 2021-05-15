@@ -1,10 +1,9 @@
 //! Totalistic hexagonal Generations rules.
 
 use crate::{
-    error::{ConverRuleError, ParseRuleError},
-    new_rules::hex::{self, HexRule},
-    traits::{ParseGenRule, PrintGenRule},
-    util::Bs::{self, B, S},
+    error::{ConvertRuleError, ParseRuleError},
+    new_rules::hex::HexRule,
+    traits::{ParseGenRule, PrintGenRule, TotalisticGen},
 };
 use fixedbitset::FixedBitSet;
 use std::{
@@ -24,6 +23,7 @@ use std::{
 ///
 /// ```
 /// use ca_rules::new_rules::HexGenRule;
+/// use ca_rules::traits::*;
 ///
 /// let rule: HexGenRule = "g4b24s13h".parse().unwrap();
 ///
@@ -43,38 +43,29 @@ pub struct HexGenRule {
     gen: u32,
 }
 
-impl HexGenRule {
-    /// Whether the rule contains this `b` data.
-    pub fn contains_b(&self, b: u8) -> bool {
-        self.data.contains(b as usize)
+impl TotalisticGen for HexGenRule {
+    const NBHD_SIZE: usize = 7;
+
+    const SUFFIX: Option<char> = Some('H');
+
+    #[inline]
+    fn from_data(data: FixedBitSet, gen: u32) -> Self {
+        Self { data, gen }
     }
 
-    /// Whether the rule contains this `s` data.
-    pub fn contains_s(&self, s: u8) -> bool {
-        self.data.contains(s as usize + 7)
+    #[inline]
+    fn data(&self) -> &FixedBitSet {
+        &self.data
     }
 
-    /// An iterator over the `b` data of the rule.
-    pub fn iter_b(&self) -> impl Iterator<Item = u8> + '_ {
-        self.data
-            .ones()
-            .filter_map(|bit| (bit < 7).then(|| bit as u8))
-    }
-
-    /// An iterator over the `s` data of the rule.
-    pub fn iter_s(&self) -> impl Iterator<Item = u8> + '_ {
-        self.data
-            .ones()
-            .filter_map(|bit| (bit >= 7).then(|| (bit - 7) as u8))
-    }
-
-    /// The generation number.
-    pub fn gen(&self) -> u32 {
+    #[inline]
+    fn gen(&self) -> u32 {
         self.gen
     }
 }
 
 impl Default for HexGenRule {
+    #[inline]
     fn default() -> Self {
         Self {
             data: FixedBitSet::with_capacity(14),
@@ -82,61 +73,24 @@ impl Default for HexGenRule {
         }
     }
 }
-
-impl ParseGenRule for HexGenRule {
-    const DATA_SIZE: usize = 14;
-    const SUFFIX: Option<char> = Some('H');
-
-    fn read_bs<I>(data: &mut FixedBitSet, chars: &mut std::iter::Peekable<I>, bs: Bs)
-    where
-        I: Iterator<Item = char>,
-    {
-        hex::read_bs(data, chars, bs)
-    }
-
-    fn from_data(data: FixedBitSet, gen: u32) -> Self {
-        Self { data, gen }
-    }
-}
-
 impl FromStr for HexGenRule {
     type Err = ParseRuleError;
 
+    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Self::parse_rule(s)
     }
 }
 
-impl PrintGenRule for HexGenRule {
-    const SUFFIX: Option<char> = Some('H');
-
-    fn gen(&self) -> u32 {
-        self.gen
-    }
-
-    fn write_bs(&self, string: &mut String, bs: Bs) {
-        match bs {
-            B => {
-                for b in self.iter_b() {
-                    string.push(char::from_digit(b as u32, 7).unwrap());
-                }
-            }
-            S => {
-                for s in self.iter_s() {
-                    string.push(char::from_digit(s as u32, 7).unwrap());
-                }
-            }
-        }
-    }
-}
-
 impl Display for HexGenRule {
+    #[inline]
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         f.write_str(&self.to_string_sbg())
     }
 }
 
 impl From<HexRule> for HexGenRule {
+    #[inline]
     fn from(rule: HexRule) -> Self {
         Self {
             data: rule.data,
@@ -146,11 +100,11 @@ impl From<HexRule> for HexGenRule {
 }
 
 impl TryFrom<HexGenRule> for HexRule {
-    type Error = ConverRuleError;
+    type Error = ConvertRuleError;
 
     fn try_from(rule: HexGenRule) -> Result<Self, Self::Error> {
         if rule.gen != 2 {
-            Err(ConverRuleError::GenGreaterThan2)
+            Err(ConvertRuleError::GenGreaterThan2)
         } else {
             Ok(Self { data: rule.data })
         }

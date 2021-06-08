@@ -165,3 +165,36 @@ pub trait ParseGenRule: Sized {
         }
     }
 }
+
+/// A trait for parsing non-Generations rules with
+/// [MAP string](https://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton).
+pub trait ParseMapRule: Sized {
+    /// Size of the data in a [`FixedBitSet`].
+    const DATA_SIZE: usize;
+
+    /// Generate a new rule from the data in a [`FixedBitSet`].
+    fn from_data(data: FixedBitSet) -> Self;
+
+    /// A parser for MAP strings.
+    fn parse_rule_map(input: &str) -> Result<Self, ParseRuleError> {
+        if !input.starts_with("MAP") {
+            return Err(ParseRuleError::NotMapRule);
+        }
+        let bytes = base64::decode(&input[3..]).map_err(|_| ParseRuleError::Base64Error)?;
+        if bytes.len() * 8 != 2 << Self::DATA_SIZE {
+            return Err(ParseRuleError::InvalidLength);
+        }
+
+        let mut data = FixedBitSet::with_capacity(Self::DATA_SIZE);
+
+        for (i, x) in bytes.iter().map(|x| x.reverse_bits()).enumerate() {
+            for j in 0..8 {
+                if x & (1 << j) != 0 {
+                    let k = i * 8 + j;
+                    data.insert(k);
+                }
+            }
+        }
+        Ok(Self::from_data(data))
+    }
+}

@@ -79,6 +79,7 @@ pub mod traits;
 mod util;
 
 pub use error::{ConvertRuleError, ParseRuleError};
+pub use fixedbitset;
 pub use new_rules::*;
 pub use rules::*;
 pub use traits::*;

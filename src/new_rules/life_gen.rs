@@ -80,7 +80,11 @@ impl FromStr for LifeGenRule {
 
 impl Display for LifeGenRule {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.write_str(&self.to_string_sbg())
+        if self.gen() != 2 {
+            f.write_str(&self.to_string_sbg())
+        } else {
+            f.write_str(&self.to_string_bsg())
+        }
     }
 }
 
@@ -108,6 +112,7 @@ impl TryFrom<LifeGenRule> for LifeRule {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ParseRule;
 
     #[test]
     fn parse_rule() -> Result<(), ParseRuleError> {
@@ -124,6 +129,28 @@ mod tests {
         assert_eq!(rule.to_string_bsg(), "B357/S3457/G5");
         assert_eq!(rule.to_string_sbg(), "3457/357/5");
         assert_eq!(rule.to_string_catagolue(), "g5b357s3457");
+        Ok(())
+    }
+
+    #[test]
+    fn parse_rule_nongen() -> Result<(), ParseRuleError> {
+        let rule = LifeGenRule::parse_rule("B3/S23")?;
+
+        let b: Vec<u8> = rule.iter_b().collect();
+        let s: Vec<u8> = rule.iter_s().collect();
+        let gen = rule.gen();
+
+        assert_eq!(b, vec![3]);
+        assert_eq!(s, vec![2, 3]);
+        assert_eq!(gen, 2);
+
+        assert_eq!(rule.to_string_bsg(), "B3/S23");
+        assert_eq!(rule.to_string_sbg(), "23/3");
+        assert_eq!(rule.to_string_catagolue(), "b3s23");
+
+        let non_gen = LifeRule::parse_rule("B3/S23")?;
+        assert_eq!(LifeRule::try_from(rule).unwrap(), non_gen);
+
         Ok(())
     }
 

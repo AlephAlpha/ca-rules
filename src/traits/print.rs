@@ -71,9 +71,11 @@ pub trait PrintGenRule {
         string.push('/');
         string.push('S');
         self.write_bs(&mut string, S);
-        string.push('/');
-        string.push('G');
-        string.push_str(&self.get_gen().to_string());
+        if self.get_gen() != 2 {
+            string.push('/');
+            string.push('G');
+            string.push_str(&self.get_gen().to_string());
+        }
         if let Some(suffix) = Self::SUFFIX {
             string.push(suffix.to_ascii_uppercase());
         }
@@ -87,8 +89,10 @@ pub trait PrintGenRule {
         self.write_bs(&mut string, S);
         string.push('/');
         self.write_bs(&mut string, B);
-        string.push('/');
-        string.push_str(&self.get_gen().to_string());
+        if self.get_gen() != 2 {
+            string.push('/');
+            string.push_str(&self.get_gen().to_string());
+        }
         if let Some(suffix) = Self::SUFFIX {
             string.push(suffix.to_ascii_uppercase());
         }
@@ -99,8 +103,10 @@ pub trait PrintGenRule {
     fn to_string_catagolue(&self) -> String {
         let mut string = String::new();
 
-        string.push('g');
-        string.push_str(&self.get_gen().to_string());
+        if self.get_gen() != 2 {
+            string.push('g');
+            string.push_str(&self.get_gen().to_string());
+        }
         string.push('b');
         self.write_bs(&mut string, B);
         string.push('s');

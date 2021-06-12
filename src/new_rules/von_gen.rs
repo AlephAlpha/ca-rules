@@ -107,6 +107,7 @@ impl TryFrom<VonGenRule> for VonRule {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ParseRule;
 
     #[test]
     fn parse_rule() -> Result<(), ParseRuleError> {
@@ -123,6 +124,28 @@ mod tests {
         assert_eq!(rule.to_string_bsg(), "B2/S013/G3V");
         assert_eq!(rule.to_string_sbg(), "013/2/3V");
         assert_eq!(rule.to_string_catagolue(), "g3b2s013v");
+        Ok(())
+    }
+
+    #[test]
+    fn parse_rule_nongen() -> Result<(), ParseRuleError> {
+        let rule = VonGenRule::parse_rule("B2/S013V")?;
+
+        let b: Vec<u8> = rule.iter_b().collect();
+        let s: Vec<u8> = rule.iter_s().collect();
+        let gen = rule.gen();
+
+        assert_eq!(b, vec![2]);
+        assert_eq!(s, vec![0, 1, 3]);
+        assert_eq!(gen, 2);
+
+        assert_eq!(rule.to_string_bsg(), "B2/S013V");
+        assert_eq!(rule.to_string_sbg(), "013/2V");
+        assert_eq!(rule.to_string_catagolue(), "b2s013v");
+
+        let non_gen = VonRule::parse_rule("B2/S013V")?;
+        assert_eq!(VonRule::try_from(rule).unwrap(), non_gen);
+
         Ok(())
     }
 }

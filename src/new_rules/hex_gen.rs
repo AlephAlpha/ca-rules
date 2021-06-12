@@ -111,6 +111,7 @@ impl TryFrom<HexGenRule> for HexRule {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ParseRule;
 
     #[test]
     fn parse_rule() -> Result<(), ParseRuleError> {
@@ -127,6 +128,28 @@ mod tests {
         assert_eq!(rule.to_string_bsg(), "B24/S13/G4H");
         assert_eq!(rule.to_string_sbg(), "13/24/4H");
         assert_eq!(rule.to_string_catagolue(), "g4b24s13h");
+        Ok(())
+    }
+
+    #[test]
+    fn parse_rule_nongen() -> Result<(), ParseRuleError> {
+        let rule = HexGenRule::parse_rule("B2/S34H")?;
+
+        let b: Vec<u8> = rule.iter_b().collect();
+        let s: Vec<u8> = rule.iter_s().collect();
+        let gen = rule.gen();
+
+        assert_eq!(b, vec![2]);
+        assert_eq!(s, vec![3, 4]);
+        assert_eq!(gen, 2);
+
+        assert_eq!(rule.to_string_bsg(), "B2/S34H");
+        assert_eq!(rule.to_string_sbg(), "34/2H");
+        assert_eq!(rule.to_string_catagolue(), "b2s34h");
+
+        let non_gen = HexRule::parse_rule("B2/S34H")?;
+        assert_eq!(HexRule::try_from(rule).unwrap(), non_gen);
+
         Ok(())
     }
 

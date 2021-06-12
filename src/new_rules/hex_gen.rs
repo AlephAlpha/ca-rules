@@ -16,9 +16,6 @@ use std::{
 /// [Totalistic hexagonal](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood)
 /// [Generations](http://www.conwaylife.com/wiki/Generations) rules.
 ///
-/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
-/// that cause a cell to be born / survive.
-///
 /// # Examples
 ///
 /// ```

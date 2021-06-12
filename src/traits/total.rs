@@ -64,6 +64,9 @@ impl<'a> Iterator for IterS<'a> {
 }
 
 /// A trait for totalistic rules.
+///
+/// The `b` / `s` data of these rules consists of numbers of live neighbors
+/// that cause a cell to be born / survive.
 pub trait Totalistic: Sized {
     /// Number of cells in the neighborhood, including the cell itself.
     const NBHD_SIZE: usize;

@@ -13,9 +13,6 @@ use std::{
 
 /// [Totalistic life-like rules](http://www.conwaylife.com/wiki/Totalistic_Life-like_cellular_automaton).
 ///
-/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
-/// that cause a cell to be born / survive.
-///
 /// # Examples
 ///
 /// ```

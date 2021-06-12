@@ -13,9 +13,6 @@ use std::{
 
 /// [Totalistic hexagonal rules](http://www.conwaylife.com/wiki/Hexagonal_neighbourhood).
 ///
-/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
-/// that cause a cell to be born / survive.
-///
 /// # Examples
 ///
 /// ```

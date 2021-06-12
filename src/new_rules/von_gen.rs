@@ -16,9 +16,6 @@ use std::{
 /// Totalistic [Generations](http://www.conwaylife.com/wiki/Generations) rules
 /// with [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
 ///
-/// The `b` / `s` data of this type of rules consists of numbers of live neighbors
-/// that cause a cell to be born / survive.
-///
 /// # Examples
 ///
 /// ```

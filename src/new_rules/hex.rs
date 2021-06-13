@@ -86,6 +86,11 @@ mod tests {
         assert_eq!(b, vec![2]);
         assert_eq!(s, vec![3, 4]);
 
+        for i in 0..HexRule::NBHD_SIZE as u8 {
+            assert_eq!(b.contains(&i), rule.contains_b(i));
+            assert_eq!(s.contains(&i), rule.contains_s(i));
+        }
+
         assert_eq!(rule.to_string_bs(), "B2/S34H");
         assert_eq!(rule.to_string_sb(), "34/2H");
         assert_eq!(rule.to_string_catagolue(), "b2s34h");

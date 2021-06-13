@@ -89,6 +89,11 @@ mod tests {
         assert_eq!(b, vec![2]);
         assert_eq!(s, vec![0, 1, 3]);
 
+        for i in 0..VonRule::NBHD_SIZE as u8 {
+            assert_eq!(b.contains(&i), rule.contains_b(i));
+            assert_eq!(s.contains(&i), rule.contains_s(i));
+        }
+
         assert_eq!(rule.to_string_bs(), "B2/S013V");
         assert_eq!(rule.to_string_sb(), "013/2V");
         assert_eq!(rule.to_string_catagolue(), "b2s013v");

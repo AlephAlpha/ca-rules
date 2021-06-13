@@ -88,6 +88,11 @@ mod tests {
         assert_eq!(b, vec![3]);
         assert_eq!(s, vec![2, 3]);
 
+        for i in 0..LifeRule::NBHD_SIZE as u8 {
+            assert_eq!(b.contains(&i), rule.contains_b(i));
+            assert_eq!(s.contains(&i), rule.contains_s(i));
+        }
+
         assert_eq!(rule.to_string_bs(), "B3/S23");
         assert_eq!(rule.to_string_sb(), "23/3");
         assert_eq!(rule.to_string_catagolue(), "b3s23");

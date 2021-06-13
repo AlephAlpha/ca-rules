@@ -6,7 +6,7 @@ use crate::{
     },
 };
 use fixedbitset::FixedBitSet;
-use std::iter::Peekable;
+use std::{convert::TryInto, iter::Peekable};
 
 /// A trait for parsing non-Generations rules.
 pub trait ParseRule: Sized {
@@ -177,24 +177,26 @@ pub trait ParseMapRule: Sized {
 
     /// A parser for MAP strings.
     fn parse_rule_map(input: &str) -> Result<Self, ParseRuleError> {
+        assert_eq!(
+            Self::DATA_SIZE % 4,
+            0,
+            "`DATA_SIZE` should be a multiple of 4."
+        );
+
         if !input.starts_with("MAP") {
             return Err(ParseRuleError::NotMapRule);
         }
         let bytes = base64::decode(&input[3..]).map_err(|_| ParseRuleError::Base64Error)?;
-        if bytes.len() * 8 != 2 << Self::DATA_SIZE {
+        if bytes.len() * 8 != Self::DATA_SIZE {
             return Err(ParseRuleError::InvalidLength);
         }
 
-        let mut data = FixedBitSet::with_capacity(Self::DATA_SIZE);
+        let blocks = bytes
+            .chunks_exact(4)
+            .map(|chunk| u32::from_be_bytes(chunk.try_into().unwrap()).reverse_bits());
 
-        for (i, x) in bytes.iter().map(|x| x.reverse_bits()).enumerate() {
-            for j in 0..8 {
-                if x & (1 << j) != 0 {
-                    let k = i * 8 + j;
-                    data.insert(k);
-                }
-            }
-        }
+        let data = FixedBitSet::with_capacity_and_blocks(Self::DATA_SIZE, blocks);
+
         Ok(Self::from_data(data))
     }
 }

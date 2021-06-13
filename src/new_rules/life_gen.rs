@@ -112,7 +112,7 @@ impl TryFrom<LifeGenRule> for LifeRule {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ParseRule;
+    use crate::traits::ParseRule;
 
     #[test]
     fn parse_rule() -> Result<(), ParseRuleError> {

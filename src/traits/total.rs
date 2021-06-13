@@ -96,7 +96,7 @@ pub trait Totalistic: Sized {
     /// Whether the rule contains this `s` data.
     #[inline]
     fn contains_s(&self, s: u8) -> bool {
-        self.data().contains(s as usize + 7)
+        self.data().contains(s as usize + Self::NBHD_SIZE)
     }
 
     /// An iterator over the `b` data of the rule.
@@ -187,13 +187,13 @@ pub trait TotalisticGen: Sized {
     /// Whether the rule contains this `b` data.
     #[inline]
     fn contains_b(&self, b: u8) -> bool {
-        self.data().contains(b as usize)
+        (b as usize) < Self::NBHD_SIZE && self.data().contains(b as usize)
     }
 
     /// Whether the rule contains this `s` data.
     #[inline]
     fn contains_s(&self, s: u8) -> bool {
-        self.data().contains(s as usize + 7)
+        (s as usize) < Self::NBHD_SIZE && self.data().contains(s as usize + 7)
     }
 
     /// An iterator over the `b` data of the rule.

@@ -3,11 +3,14 @@
 use crate::{
     error::ParseRuleError,
     new_rules::VonRule,
-    traits::{ParseMapRule, PrintMapRule, Totalistic},
+    traits::{MapRule, ParseMapRule, PrintMapRule, Totalistic},
     ParseRule,
 };
 use fixedbitset::FixedBitSet;
-use std::str::FromStr;
+use std::{
+    fmt::{self, Display, Formatter},
+    str::FromStr,
+};
 
 /// Non-totalistic rules with
 /// [von Neumann neighborhood](http://www.conwaylife.com/wiki/Von_Neumann_neighbourhood).
@@ -32,16 +35,14 @@ impl NtVonRule {
     }
 }
 
-impl ParseMapRule for NtVonRule {
-    const DATA_SIZE: usize = 1 << 5;
+impl MapRule for NtVonRule {
+    const NBHD_SIZE: usize = 5;
 
     #[inline]
     fn from_data(data: FixedBitSet) -> Self {
         Self { data }
     }
-}
 
-impl PrintMapRule for NtVonRule {
     #[inline]
     fn data(&self) -> &FixedBitSet {
         &self.data
@@ -71,6 +72,13 @@ impl FromStr for NtVonRule {
                 }
             })
         })
+    }
+}
+
+impl Display for NtVonRule {
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        f.write_str(&self.to_string_map())
     }
 }
 

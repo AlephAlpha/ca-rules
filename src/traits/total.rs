@@ -79,7 +79,7 @@ pub trait Totalistic: Sized {
     /// The `b`/`s` data, in a [`FixedBitSet`].
     fn data(&self) -> &FixedBitSet;
 
-    /// A new rule with empty `b`/`s` data, i.e., `B/S`.
+    /// A new rule with empty `b`/`s` data, e.g., `B/S`.
     #[inline]
     fn new() -> Self {
         let data = FixedBitSet::with_capacity(2 * Self::NBHD_SIZE);

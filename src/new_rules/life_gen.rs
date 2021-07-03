@@ -62,6 +62,7 @@ impl TotalisticGen for LifeGenRule {
 }
 
 impl Default for LifeGenRule {
+    #[inline]
     fn default() -> Self {
         Self {
             data: FixedBitSet::with_capacity(18),
@@ -73,12 +74,14 @@ impl Default for LifeGenRule {
 impl FromStr for LifeGenRule {
     type Err = ParseRuleError;
 
+    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Self::parse_rule(s)
     }
 }
 
 impl Display for LifeGenRule {
+    #[inline]
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         if self.gen() != 2 {
             f.write_str(&self.to_string_sbg())
@@ -89,6 +92,7 @@ impl Display for LifeGenRule {
 }
 
 impl From<LifeRule> for LifeGenRule {
+    #[inline]
     fn from(rule: LifeRule) -> Self {
         Self {
             data: rule.data,
@@ -100,6 +104,7 @@ impl From<LifeRule> for LifeGenRule {
 impl TryFrom<LifeGenRule> for LifeRule {
     type Error = ConvertRuleError;
 
+    #[inline]
     fn try_from(rule: LifeGenRule) -> Result<Self, Self::Error> {
         if rule.gen != 2 {
             Err(ConvertRuleError::GenGreaterThan2)

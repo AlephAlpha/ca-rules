@@ -82,7 +82,11 @@ impl FromStr for HexGenRule {
 impl Display for HexGenRule {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.write_str(&self.to_string_sbg())
+        if self.gen() != 2 {
+            f.write_str(&self.to_string_sbg())
+        } else {
+            f.write_str(&self.to_string_bsg())
+        }
     }
 }
 
@@ -99,6 +103,7 @@ impl From<HexRule> for HexGenRule {
 impl TryFrom<HexGenRule> for HexRule {
     type Error = ConvertRuleError;
 
+    #[inline]
     fn try_from(rule: HexGenRule) -> Result<Self, Self::Error> {
         if rule.gen != 2 {
             Err(ConvertRuleError::GenGreaterThan2)

@@ -26,7 +26,8 @@ pub struct NtVonRule {
 
 impl NtVonRule {
     /// The rule data, in a [`FixedBitSet`].
-    pub fn data(&self) -> &FixedBitSet {
+    #[inline]
+    pub const fn data(&self) -> &FixedBitSet {
         &self.data
     }
 }
@@ -34,6 +35,7 @@ impl NtVonRule {
 impl ParseMapRule for NtVonRule {
     const DATA_SIZE: usize = 1 << 5;
 
+    #[inline]
     fn from_data(data: FixedBitSet) -> Self {
         Self { data }
     }
@@ -66,6 +68,7 @@ impl FromStr for NtVonRule {
 }
 
 impl From<VonRule> for NtVonRule {
+    #[inline]
     fn from(rule: VonRule) -> Self {
         let mut data = FixedBitSet::with_capacity(1 << 5);
         for i in 0_usize..1 << 5 {

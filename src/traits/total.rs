@@ -13,7 +13,7 @@ pub struct IterB<'a> {
 
 impl<'a> IterB<'a> {
     #[inline]
-    fn new(iter: Ones<'a>, nbhd_size: usize) -> Self {
+    const fn new(iter: Ones<'a>, nbhd_size: usize) -> Self {
         Self { iter, nbhd_size }
     }
 }
@@ -42,7 +42,7 @@ pub struct IterS<'a> {
 
 impl<'a> IterS<'a> {
     #[inline]
-    fn new(iter: Ones<'a>, nbhd_size: usize) -> Self {
+    const fn new(iter: Ones<'a>, nbhd_size: usize) -> Self {
         Self { iter, nbhd_size }
     }
 }
@@ -241,7 +241,7 @@ impl<R: TotalisticGen> PrintGenRule for R {
 
     #[inline]
     fn get_gen(&self) -> u32 {
-        <Self as TotalisticGen>::gen(&self)
+        <Self as TotalisticGen>::gen(self)
     }
 
     #[inline]

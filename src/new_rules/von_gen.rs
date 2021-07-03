@@ -62,6 +62,7 @@ impl TotalisticGen for VonGenRule {
 }
 
 impl Default for VonGenRule {
+    #[inline]
     fn default() -> Self {
         Self {
             data: FixedBitSet::with_capacity(10),
@@ -73,17 +74,24 @@ impl Default for VonGenRule {
 impl FromStr for VonGenRule {
     type Err = ParseRuleError;
 
+    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Self::parse_rule(s)
     }
 }
 impl Display for VonGenRule {
+    #[inline]
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.write_str(&self.to_string_sbg())
+        if self.gen() != 2 {
+            f.write_str(&self.to_string_sbg())
+        } else {
+            f.write_str(&self.to_string_bsg())
+        }
     }
 }
 
 impl From<VonRule> for VonGenRule {
+    #[inline]
     fn from(rule: VonRule) -> Self {
         Self {
             data: rule.data,
@@ -95,6 +103,7 @@ impl From<VonRule> for VonGenRule {
 impl TryFrom<VonGenRule> for VonRule {
     type Error = ConvertRuleError;
 
+    #[inline]
     fn try_from(rule: VonGenRule) -> Result<Self, Self::Error> {
         if rule.gen != 2 {
             Err(ConvertRuleError::GenGreaterThan2)

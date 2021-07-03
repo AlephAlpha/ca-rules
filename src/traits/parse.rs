@@ -1,12 +1,26 @@
-use crate::{
-    error::ParseRuleError,
-    util::{
-        self,
-        Bs::{self, B, S},
-    },
-};
+use crate::error::ParseRuleError;
 use fixedbitset::FixedBitSet;
 use std::{convert::TryInto, iter::Peekable};
+
+/// A parser for numbers.
+fn parse_num<I>(chars: &mut Peekable<I>) -> Result<u32, ParseRuleError>
+where
+    I: Iterator<Item = char>,
+{
+    let mut n = 0_u32;
+    if chars.peek().is_none() || !chars.peek().unwrap().is_digit(10) {
+        return Err(ParseRuleError::MissingNumber);
+    }
+    while let Some(&c) = chars.peek().filter(|c| c.is_digit(10)) {
+        chars.next();
+        n = n
+            .checked_mul(10)
+            .ok_or(ParseRuleError::GenOverflow)?
+            .checked_add(c.to_digit(10).unwrap() as u32)
+            .ok_or(ParseRuleError::GenOverflow)?;
+    }
+    Ok(n)
+}
 
 /// A trait for parsing non-Generations rules.
 pub trait ParseRule: Sized {
@@ -16,8 +30,13 @@ pub trait ParseRule: Sized {
     /// The suffix of the rule string.
     const SUFFIX: Option<char>;
 
-    /// Reading `b`/`s` data.
-    fn read_bs<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>, bs: Bs)
+    /// Reading `b` data.
+    fn read_b<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>)
+    where
+        I: Iterator<Item = char>;
+
+    /// Reading `s` data.
+    fn read_s<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>)
     where
         I: Iterator<Item = char>;
 
@@ -32,21 +51,21 @@ pub trait ParseRule: Sized {
         if matches!(chars.peek(), Some('B') | Some('b')) {
             // Rule strings using B/S notation
             chars.next();
-            Self::read_bs(&mut data, &mut chars, B);
+            Self::read_b(&mut data, &mut chars);
             if let Some('/') = chars.peek() {
                 chars.next();
             }
             if !matches!(chars.next(), Some('S') | Some('s')) {
                 return Err(ParseRuleError::Missing('S'));
             }
-            Self::read_bs(&mut data, &mut chars, S);
+            Self::read_s(&mut data, &mut chars);
         } else {
             // Rule strings using S/B notation
-            Self::read_bs(&mut data, &mut chars, S);
+            Self::read_s(&mut data, &mut chars);
             if chars.next() != Some('/') {
                 return Err(ParseRuleError::Missing('/'));
             }
-            Self::read_bs(&mut data, &mut chars, B);
+            Self::read_b(&mut data, &mut chars);
         }
 
         if let Some(suffix) = Self::SUFFIX {
@@ -71,8 +90,13 @@ pub trait ParseGenRule: Sized {
     /// The suffix of the rule string.
     const SUFFIX: Option<char>;
 
-    /// Reading `b`/`s` data.
-    fn read_bs<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>, bs: Bs)
+    /// Reading `b` data.
+    fn read_b<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>)
+    where
+        I: Iterator<Item = char>;
+
+    /// Reading `s` data.
+    fn read_s<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>)
     where
         I: Iterator<Item = char>;
 
@@ -89,25 +113,25 @@ pub trait ParseGenRule: Sized {
             // Rule strings using B/S/G notation
             Some('B') | Some('b') => {
                 chars.next();
-                Self::read_bs(&mut data, &mut chars, B);
+                Self::read_b(&mut data, &mut chars);
                 if let Some('/') = chars.peek() {
                     chars.next();
                 }
                 if !matches!(chars.next(), Some('S') | Some('s')) {
                     return Err(ParseRuleError::Missing('S'));
                 }
-                Self::read_bs(&mut data, &mut chars, S);
+                Self::read_s(&mut data, &mut chars);
                 match chars.peek() {
                     Some('/') => {
                         chars.next();
                         if matches!(chars.peek(), Some('C') | Some('c') | Some('G') | Some('g')) {
                             chars.next();
                         }
-                        gen = util::parse_num(&mut chars)?;
+                        gen = parse_num(&mut chars)?;
                     }
                     Some('C') | Some('c') | Some('G') | Some('g') => {
                         chars.next();
-                        gen = util::parse_num(&mut chars)?;
+                        gen = parse_num(&mut chars)?;
                     }
                     _ => (),
                 }
@@ -116,33 +140,33 @@ pub trait ParseGenRule: Sized {
             // Rule strings using G/B/S notation
             Some('C') | Some('c') | Some('G') | Some('g') => {
                 chars.next();
-                gen = util::parse_num(&mut chars)?;
+                gen = parse_num(&mut chars)?;
                 if let Some('/') = chars.peek() {
                     chars.next();
                 }
                 if !matches!(chars.next(), Some('B') | Some('b')) {
                     return Err(ParseRuleError::Missing('B'));
                 }
-                Self::read_bs(&mut data, &mut chars, B);
+                Self::read_b(&mut data, &mut chars);
                 if let Some('/') = chars.peek() {
                     chars.next();
                 }
                 if !matches!(chars.next(), Some('S') | Some('s')) {
                     return Err(ParseRuleError::Missing('S'));
                 }
-                Self::read_bs(&mut data, &mut chars, S);
+                Self::read_s(&mut data, &mut chars);
             }
 
             // Rule strings using S/B/G notation
             _ => {
-                Self::read_bs(&mut data, &mut chars, S);
+                Self::read_s(&mut data, &mut chars);
                 if chars.next() != Some('/') {
                     return Err(ParseRuleError::Missing('/'));
                 }
-                Self::read_bs(&mut data, &mut chars, B);
+                Self::read_b(&mut data, &mut chars);
                 if let Some('/') = chars.peek() {
                     chars.next();
-                    gen = util::parse_num(&mut chars)?;
+                    gen = parse_num(&mut chars)?;
                 }
             }
         }

@@ -1,7 +1,6 @@
 //! A trait for totalistic rules.
 
 use super::{ParseGenRule, ParseRule, PrintGenRule, PrintRule};
-use crate::util::Bs::{self, B, S};
 use fixedbitset::{FixedBitSet, Ones};
 use std::iter::Peekable;
 
@@ -117,7 +116,7 @@ impl<R: Totalistic> ParseRule for R {
     const SUFFIX: Option<char> = <Self as Totalistic>::SUFFIX;
 
     #[inline]
-    fn read_bs<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>, bs: Bs)
+    fn read_b<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>)
     where
         I: Iterator<Item = char>,
     {
@@ -126,10 +125,21 @@ impl<R: Totalistic> ParseRule for R {
             .and_then(|c| c.to_digit(Self::NBHD_SIZE as u32))
         {
             chars.next();
-            match bs {
-                B => data.insert(d as usize),
-                S => data.insert((d as usize) + Self::NBHD_SIZE),
-            }
+            data.insert(d as usize)
+        }
+    }
+
+    #[inline]
+    fn read_s<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>)
+    where
+        I: Iterator<Item = char>,
+    {
+        while let Some(d) = chars
+            .peek()
+            .and_then(|c| c.to_digit(Self::NBHD_SIZE as u32))
+        {
+            chars.next();
+            data.insert((d as usize) + Self::NBHD_SIZE)
         }
     }
 
@@ -143,18 +153,16 @@ impl<R: Totalistic> PrintRule for R {
     const SUFFIX: Option<char> = <Self as Totalistic>::SUFFIX;
 
     #[inline]
-    fn write_bs(&self, string: &mut String, bs: Bs) {
-        match bs {
-            B => {
-                for b in self.iter_b() {
-                    string.push(char::from_digit(b as u32, Self::NBHD_SIZE as u32).unwrap());
-                }
-            }
-            S => {
-                for s in self.iter_s() {
-                    string.push(char::from_digit(s as u32, Self::NBHD_SIZE as u32).unwrap());
-                }
-            }
+    fn write_b(&self, string: &mut String) {
+        for b in self.iter_b() {
+            string.push(char::from_digit(b as u32, Self::NBHD_SIZE as u32).unwrap());
+        }
+    }
+
+    #[inline]
+    fn write_s(&self, string: &mut String) {
+        for s in self.iter_s() {
+            string.push(char::from_digit(s as u32, Self::NBHD_SIZE as u32).unwrap());
         }
     }
 }
@@ -214,7 +222,7 @@ impl<R: TotalisticGen> ParseGenRule for R {
     const SUFFIX: Option<char> = <Self as TotalisticGen>::SUFFIX;
 
     #[inline]
-    fn read_bs<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>, bs: Bs)
+    fn read_b<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>)
     where
         I: Iterator<Item = char>,
     {
@@ -223,10 +231,21 @@ impl<R: TotalisticGen> ParseGenRule for R {
             .and_then(|c| c.to_digit(Self::NBHD_SIZE as u32))
         {
             chars.next();
-            match bs {
-                B => data.insert(d as usize),
-                S => data.insert((d as usize) + Self::NBHD_SIZE),
-            }
+            data.insert(d as usize)
+        }
+    }
+
+    #[inline]
+    fn read_s<I>(data: &mut FixedBitSet, chars: &mut Peekable<I>)
+    where
+        I: Iterator<Item = char>,
+    {
+        while let Some(d) = chars
+            .peek()
+            .and_then(|c| c.to_digit(Self::NBHD_SIZE as u32))
+        {
+            chars.next();
+            data.insert((d as usize) + Self::NBHD_SIZE)
         }
     }
 
@@ -245,18 +264,16 @@ impl<R: TotalisticGen> PrintGenRule for R {
     }
 
     #[inline]
-    fn write_bs(&self, string: &mut String, bs: Bs) {
-        match bs {
-            B => {
-                for b in self.iter_b() {
-                    string.push(char::from_digit(b as u32, Self::NBHD_SIZE as u32).unwrap());
-                }
-            }
-            S => {
-                for s in self.iter_s() {
-                    string.push(char::from_digit(s as u32, Self::NBHD_SIZE as u32).unwrap());
-                }
-            }
+    fn write_b(&self, string: &mut String) {
+        for b in self.iter_b() {
+            string.push(char::from_digit(b as u32, Self::NBHD_SIZE as u32).unwrap());
+        }
+    }
+
+    #[inline]
+    fn write_s(&self, string: &mut String) {
+        for s in self.iter_s() {
+            string.push(char::from_digit(s as u32, Self::NBHD_SIZE as u32).unwrap());
         }
     }
 }

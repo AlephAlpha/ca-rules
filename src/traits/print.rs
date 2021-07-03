@@ -1,4 +1,3 @@
-use crate::util::Bs::{self, B, S};
 use fixedbitset::FixedBitSet;
 
 /// A trait for printing non-Generations rules.
@@ -6,18 +5,21 @@ pub trait PrintRule {
     /// The suffix of the rule string.
     const SUFFIX: Option<char>;
 
-    /// Writing `b`/`s` data.
-    fn write_bs(&self, string: &mut String, bs: Bs);
+    /// Writing `b` data.
+    fn write_b(&self, string: &mut String);
+
+    /// Writing `s` data.
+    fn write_s(&self, string: &mut String);
 
     /// Print the rule in B/S notation, e.g. `B3/S23`.
     fn to_string_bs(&self) -> String {
         let mut string = String::new();
 
         string.push('B');
-        self.write_bs(&mut string, B);
+        self.write_b(&mut string);
         string.push('/');
         string.push('S');
-        self.write_bs(&mut string, S);
+        self.write_s(&mut string);
         if let Some(suffix) = Self::SUFFIX {
             string.push(suffix.to_ascii_uppercase());
         }
@@ -28,9 +30,9 @@ pub trait PrintRule {
     fn to_string_sb(&self) -> String {
         let mut string = String::new();
 
-        self.write_bs(&mut string, S);
+        self.write_s(&mut string);
         string.push('/');
-        self.write_bs(&mut string, B);
+        self.write_b(&mut string);
         if let Some(suffix) = Self::SUFFIX {
             string.push(suffix.to_ascii_uppercase());
         }
@@ -42,9 +44,9 @@ pub trait PrintRule {
         let mut string = String::new();
 
         string.push('b');
-        self.write_bs(&mut string, B);
+        self.write_b(&mut string);
         string.push('s');
-        self.write_bs(&mut string, S);
+        self.write_s(&mut string);
         if let Some(suffix) = Self::SUFFIX {
             string.push(suffix.to_ascii_lowercase());
         }
@@ -57,8 +59,11 @@ pub trait PrintGenRule {
     /// The suffix of the rule string.
     const SUFFIX: Option<char>;
 
-    /// Writing `b`/`s` data.
-    fn write_bs(&self, string: &mut String, bs: Bs);
+    /// Writing `b` data.
+    fn write_b(&self, string: &mut String);
+
+    /// Writing `s` data.
+    fn write_s(&self, string: &mut String);
 
     // The generation number.
     fn get_gen(&self) -> u32;
@@ -68,10 +73,10 @@ pub trait PrintGenRule {
         let mut string = String::new();
 
         string.push('B');
-        self.write_bs(&mut string, B);
+        self.write_b(&mut string);
         string.push('/');
         string.push('S');
-        self.write_bs(&mut string, S);
+        self.write_s(&mut string);
         if self.get_gen() != 2 {
             string.push('/');
             string.push('G');
@@ -87,9 +92,9 @@ pub trait PrintGenRule {
     fn to_string_sbg(&self) -> String {
         let mut string = String::new();
 
-        self.write_bs(&mut string, S);
+        self.write_s(&mut string);
         string.push('/');
-        self.write_bs(&mut string, B);
+        self.write_b(&mut string);
         if self.get_gen() != 2 {
             string.push('/');
             string.push_str(&self.get_gen().to_string());
@@ -109,9 +114,9 @@ pub trait PrintGenRule {
             string.push_str(&self.get_gen().to_string());
         }
         string.push('b');
-        self.write_bs(&mut string, B);
+        self.write_b(&mut string);
         string.push('s');
-        self.write_bs(&mut string, S);
+        self.write_s(&mut string);
         if let Some(suffix) = Self::SUFFIX {
             string.push(suffix.to_ascii_lowercase());
         }

@@ -1,4 +1,5 @@
 use crate::util::Bs::{self, B, S};
+use fixedbitset::FixedBitSet;
 
 /// A trait for printing non-Generations rules.
 pub trait PrintRule {
@@ -114,6 +115,31 @@ pub trait PrintGenRule {
         if let Some(suffix) = Self::SUFFIX {
             string.push(suffix.to_ascii_lowercase());
         }
+        string
+    }
+}
+
+/// A trait for printing non-Generations rules with
+/// [MAP string](http://golly.sourceforge.net/Help/Algorithms/QuickLife.html#map).
+pub trait PrintMapRule {
+    /// The data, in a [`FixedBitSet`].
+    fn data(&self) -> &FixedBitSet;
+
+    /// Print the rule in MAP string.
+    fn to_string_map(&self) -> String {
+        let mut string = String::new();
+
+        string.push_str("MAP");
+
+        let bytes: Vec<u8> = self
+            .data()
+            .as_slice()
+            .iter()
+            .map(|block| block.reverse_bits().to_be_bytes())
+            .flatten()
+            .collect();
+
+        base64::encode_config_buf(&bytes, base64::STANDARD_NO_PAD, &mut string);
         string
     }
 }

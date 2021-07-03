@@ -167,7 +167,7 @@ pub trait ParseGenRule: Sized {
 }
 
 /// A trait for parsing non-Generations rules with
-/// [MAP string](https://www.conwaylife.com/wiki/Non-isotropic_Life-like_cellular_automaton).
+/// [MAP string](http://golly.sourceforge.net/Help/Algorithms/QuickLife.html#map).
 pub trait ParseMapRule: Sized {
     /// Size of the data in a [`FixedBitSet`]. Should be a multiple of 4.
     const DATA_SIZE: usize;

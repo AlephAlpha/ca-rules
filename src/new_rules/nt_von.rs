@@ -3,7 +3,7 @@
 use crate::{
     error::ParseRuleError,
     new_rules::VonRule,
-    traits::{ParseMapRule, Totalistic},
+    traits::{ParseMapRule, PrintMapRule, Totalistic},
     ParseRule,
 };
 use fixedbitset::FixedBitSet;
@@ -38,6 +38,13 @@ impl ParseMapRule for NtVonRule {
     #[inline]
     fn from_data(data: FixedBitSet) -> Self {
         Self { data }
+    }
+}
+
+impl PrintMapRule for NtVonRule {
+    #[inline]
+    fn data(&self) -> &FixedBitSet {
+        &self.data
     }
 }
 
@@ -97,6 +104,7 @@ mod tests {
         let totalistic = VonRule::parse_rule("B2/S013V")?;
 
         assert_eq!(NtVonRule::from(totalistic), rule);
+        assert_eq!(rule.to_string_map(), "MAPHmlphg");
 
         Ok(())
     }

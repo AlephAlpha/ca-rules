@@ -2,7 +2,7 @@
 name = "ca-rules"
 version = "0.3.3"
 authors = ["AlephAlpha <alephalpha911@gmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "Parsing rule strings of life-like cellular automata."
 homepage = "https://github.com/AlephAlpha/ca-rules"
 repository = "https://github.com/AlephAlpha/ca-rules"
@@ -11,6 +11,6 @@ readme = "README_en.md"
 keywords = ["game-of-life", "cellular-automata", "parser"]
 
 [dependencies]
-base64 = "0.13.0"
+base64 = "0.20.0"
 displaydoc = "0.2.3"
-thiserror = "1.0.30"
+thiserror = "1.0.38"

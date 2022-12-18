@@ -294,13 +294,26 @@ macro_rules! parse_rule_map {
     ($n: expr) => {
         /// A parser for the struct that parses MAP strings.
         fn parse_rule_map(input: &str) -> Result<Self, ParseRuleError> {
+            use base64::{
+                alphabet::STANDARD,
+                engine::{
+                    fast_portable::{FastPortable, FastPortableConfig},
+                    DecodePaddingMode,
+                },
+            };
+
             const CENTER_MARK: usize = 1 << ($n / 2);
             const RIGHT_MARK: usize = CENTER_MARK - 1;
             const LEFT_MARK: usize = RIGHT_MARK << ($n / 2 + 1);
+            const ENGINE_CONFIG: FastPortableConfig =
+                FastPortableConfig::new().with_decode_padding_mode(DecodePaddingMode::Indifferent);
+            const ENGINE: FastPortable = FastPortable::from(&STANDARD, ENGINE_CONFIG);
+
             if !input.starts_with("MAP") {
                 return Err(ParseRuleError::NotMapRule);
             }
-            let bytes = base64::decode(&input[3..]).map_err(|_| ParseRuleError::Base64Error)?;
+            let bytes = base64::decode_engine(&input[3..], &ENGINE)
+                .map_err(|_| ParseRuleError::Base64Error)?;
             if bytes.len() * 8 != 2 << $n {
                 return Err(ParseRuleError::InvalidLength);
             }
@@ -324,9 +337,21 @@ macro_rules! parse_rule_map {
 
         /// A parser for the Generations struct that parses MAP strings.
         fn parse_rule_gen_map(input: &str) -> Result<Gen<Self>, ParseRuleError> {
+            use base64::{
+                alphabet::STANDARD,
+                engine::{
+                    fast_portable::{FastPortable, FastPortableConfig},
+                    DecodePaddingMode,
+                },
+            };
+
             const CENTER_MARK: usize = 1 << ($n / 2);
             const RIGHT_MARK: usize = CENTER_MARK - 1;
             const LEFT_MARK: usize = RIGHT_MARK << ($n / 2 + 1);
+            const ENGINE_CONFIG: FastPortableConfig =
+                FastPortableConfig::new().with_decode_padding_mode(DecodePaddingMode::Indifferent);
+            const ENGINE: FastPortable = FastPortable::from(&STANDARD, ENGINE_CONFIG);
+
             let mut gen = 2;
             let mut slash = input.len();
             if !input.starts_with("MAP") {
@@ -344,8 +369,8 @@ macro_rules! parse_rule_map {
                     }
                 }
             }
-            let bytes =
-                base64::decode(&input[3..slash]).map_err(|_| ParseRuleError::Base64Error)?;
+            let bytes = base64::decode_engine(&input[3..slash], &ENGINE)
+                .map_err(|_| ParseRuleError::Base64Error)?;
             if bytes.len() * 8 != 2 << $n {
                 return Err(ParseRuleError::InvalidLength);
             }

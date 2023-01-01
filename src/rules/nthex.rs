@@ -98,7 +98,7 @@ pub trait ParseNtHex {
             .or_else(|_| NtHex::parse_rule(input))
             .or_else(|e| {
                 NtHex::parse_rule_map(input).map_err(|e_map| {
-                    if let ParseRuleError::NotMapRule = e_map {
+                    if e_map == ParseRuleError::NotMapRule {
                         e
                     } else {
                         e_map
@@ -164,7 +164,7 @@ pub trait ParseNtHexGen {
             .or_else(|_| NtHex::parse_rule_gen(input))
             .or_else(|e| {
                 NtHex::parse_rule_gen_map(input).map_err(|e_map| {
-                    if let ParseRuleError::NotMapRule = e_map {
+                    if e_map == ParseRuleError::NotMapRule {
                         e
                     } else {
                         e_map

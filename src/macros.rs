@@ -64,7 +64,7 @@ macro_rules! parse_rule {
                     // Rule strings using B/S notation
                     chars.next();
                     b = Self::parse_bs(&mut chars)?;
-                    if let Some('/') = chars.peek() {
+                    if chars.peek() == Some(&'/') {
                         chars.next();
                     }
                     match chars.next() {
@@ -112,7 +112,7 @@ macro_rules! parse_rule {
                 Some('B') | Some('b') => {
                     chars.next();
                     b = Self::parse_bs(&mut chars)?;
-                    if let Some('/') = chars.peek() {
+                    if chars.peek() == Some(&'/') {
                         chars.next();
                     }
                     match chars.next() {
@@ -143,7 +143,7 @@ macro_rules! parse_rule {
                 Some('C') | Some('c') | Some('G') | Some('g') => {
                     chars.next();
                     gen = Self::parse_num(&mut chars)?;
-                    if let Some('/') = chars.peek() {
+                    if chars.peek() == Some(&'/') {
                         chars.next();
                     }
                     match chars.next() {
@@ -151,7 +151,7 @@ macro_rules! parse_rule {
                         _ => return Err(ParseRuleError::Missing('B')),
                     }
                     b = Self::parse_bs(&mut chars)?;
-                    if let Some('/') = chars.peek() {
+                    if chars.peek() == Some(&'/') {
                         chars.next();
                     }
                     match chars.next() {
@@ -169,7 +169,7 @@ macro_rules! parse_rule {
                         _ => return Err(ParseRuleError::Missing('/')),
                     }
                     b = Self::parse_bs(&mut chars)?;
-                    if let Some('/') = chars.peek() {
+                    if chars.peek() == Some(&'/') {
                         chars.next();
                         gen = Self::parse_num(&mut chars)?;
                     }

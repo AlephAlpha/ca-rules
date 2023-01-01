@@ -67,7 +67,7 @@ pub trait ParseNtNeumann {
     {
         let NtNeumann { b, s } = ParseNeumann::parse_rule(input).or_else(|e| {
             NtNeumann::parse_rule_map(input).map_err(|e_map| {
-                if let ParseRuleError::NotMapRule = e_map {
+                if e_map == ParseRuleError::NotMapRule {
                     e
                 } else {
                     e_map
@@ -131,7 +131,7 @@ pub trait ParseNtNeumannGen {
             gen,
         } = ParseNeumannGen::parse_rule(input).or_else(|e| {
             NtNeumann::parse_rule_gen_map(input).map_err(|e_map| {
-                if let ParseRuleError::NotMapRule = e_map {
+                if e_map == ParseRuleError::NotMapRule {
                     e
                 } else {
                     e_map

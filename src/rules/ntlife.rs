@@ -156,7 +156,7 @@ pub trait ParseNtLife {
             .or_else(|e| ParseNtNeumann::parse_rule(input).map_err(|_| e))
             .or_else(|e| {
                 NtLife::parse_rule_map(input).map_err(|e_map| {
-                    if let ParseRuleError::NotMapRule = e_map {
+                    if e_map == ParseRuleError::NotMapRule {
                         e
                     } else {
                         e_map
@@ -224,7 +224,7 @@ pub trait ParseNtLifeGen {
             .or_else(|e| ParseNtNeumannGen::parse_rule(input).map_err(|_| e))
             .or_else(|e| {
                 NtLife::parse_rule_gen_map(input).map_err(|e_map| {
-                    if let ParseRuleError::NotMapRule = e_map {
+                    if e_map == ParseRuleError::NotMapRule {
                         e
                     } else {
                         e_map

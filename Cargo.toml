@@ -1,6 +1,6 @@
 [package]
 name = "ca-rules"
-version = "0.3.4"
+version = "0.3.5"
 authors = ["AlephAlpha <alephalpha911@gmail.com>"]
 edition = "2021"
 description = "Parsing rule strings of life-like cellular automata."
@@ -11,6 +11,6 @@ readme = "README_en.md"
 keywords = ["game-of-life", "cellular-automata", "parser"]
 
 [dependencies]
-base64 = "0.20.0"
+base64 = "0.21.0"
 displaydoc = "0.2.3"
-thiserror = "1.0.38"
+thiserror = "1.0.39"

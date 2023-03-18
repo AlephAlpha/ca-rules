@@ -83,10 +83,9 @@ mod test {
     use super::{ParseNtLife, ParseRuleError};
     use base64::{
         alphabet::STANDARD,
-        decode_engine,
         engine::{
-            fast_portable::{FastPortable, FastPortableConfig},
-            DecodePaddingMode,
+            general_purpose::{GeneralPurpose, GeneralPurposeConfig},
+            DecodePaddingMode, Engine,
         },
     };
 
@@ -102,14 +101,16 @@ mod test {
         }
     }
 
-    const ENGINE_CONFIG: FastPortableConfig =
-        FastPortableConfig::new().with_decode_padding_mode(DecodePaddingMode::Indifferent);
-    const ENGINE: FastPortable = FastPortable::from(&STANDARD, ENGINE_CONFIG);
+    const ENGINE_CONFIG: GeneralPurposeConfig =
+        GeneralPurposeConfig::new().with_decode_padding_mode(DecodePaddingMode::Indifferent);
+    const ENGINE: GeneralPurpose = GeneralPurpose::new(&STANDARD, ENGINE_CONFIG);
 
     #[test]
     fn base64() -> Result<(), ParseRuleError> {
         let s = "MAPARYXfhZofugWaH7oaIDogBZofuhogOiAaIDogIAAgAAWaH7oaIDogGiA6ICAAIAAaIDogIAAgACAAIAAAAAAAA";
-        let bytes = decode_engine(&s[3..], &ENGINE).map_err(|_| ParseRuleError::Base64Error)?;
+        let bytes = ENGINE
+            .decode(&s[3..])
+            .map_err(|_| ParseRuleError::Base64Error)?;
         assert_eq!(bytes.len(), 0x200 / 8);
         let mut b = Vec::new();
         let mut s = Vec::new();
